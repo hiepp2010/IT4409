@@ -1,15 +1,8 @@
 const express = require("express");
-
+const authRoute = require('./routes/auth.route')
+const fetchRoute = require('./routes/fetch.route')
 const router = express.Router();
-const defaultRoutes = [
-  {
-    path: "/auth",
-    route: authRoute,
-  },
-];
 
-_.forEach(defaultRoutes, (route) => {
-  router.use(route.path, route.route);
-});
-
+router.use('/auth',authRoute);
+router.use('/fetch', fetchRoute);
 module.exports = router;
