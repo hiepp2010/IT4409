@@ -1,8 +1,9 @@
 const express = require("express");
-const authRoute = require('./routes/auth.route')
-const fetchRoute = require('./routes/fetch.route')
+const adminRoute = require("./routes/admin.route");
+const customerRoute = require("./routes/customer.route");
 const router = express.Router();
 
-router.use('/auth',authRoute);
-router.use('/fetch', fetchRoute);
+router.use("/admin", adminRoute);
+router.use("/customer", customerRoute);
+
 module.exports = router;

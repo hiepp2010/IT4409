@@ -5,6 +5,8 @@ const xss = require("xss-clean");
 const port = 3000;
 const app = express();
 const routes = require("./index");
+const expressSession = require("express-session");
+const { authMiddleware } = require("./middleware/auth.middleware");
 require("./db");
 
 // set security HTTP headers
@@ -13,8 +15,15 @@ app.use(helmet());
 app.use(xss());
 // Thêm middleware để parse JSON body
 app.use(express.json());
+app.use(
+  expressSession({
+    secret: "abcxyz123",
+    resave: false,
+    saveUninitialized: false
+  })
+);
 
-app.use("/", routes);
+app.use("/", authMiddleware, routes);
 
 app.listen(port, () => {
   console.log(`Server đang chạy trên http://localhost:${port}`);
