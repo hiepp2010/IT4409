@@ -19,7 +19,7 @@ const getCart = async (req, res) => {
     res.status(500).json("Failed to get cart infomation");
   }
 };
-module.export = {
+module.exports = {
   addToCart,
   getCart,
 };
