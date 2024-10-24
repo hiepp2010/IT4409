@@ -1,4 +1,5 @@
 const productService = require("../services/product.service");
+
 const fetchProduct = async (req, res) => {
   const { productName } = req.body;
   try {
