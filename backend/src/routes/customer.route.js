@@ -19,5 +19,6 @@ router.post("/product", productController.fetchProduct);
 
 // thêm sản phẩm vào giỏ hàng
 router.post("/addToCart", cartController.addToCart);
+router.get('/getCart', cartController.getCart);
 
 module.exports = router;
