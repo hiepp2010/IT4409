@@ -14,7 +14,13 @@ const adminRegister = async (req, res) => {
 const userLogin = async (req, res) => {
   const userInfo = req.body;
   try {
-    req.session.userId = await authService.userLogin(userInfo);
+    const { sessionToken, userId } = await authService.userLogin(userInfo);
+    res.cookie('session_token', sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 24h
+    });
     res.status(200).json("Login successfully !");
   } catch (error) {
     console.error(error);
