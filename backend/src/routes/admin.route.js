@@ -5,9 +5,9 @@ const categoryControllers = require("../controllers/category.controller");
 const productController = require("../controllers/product.controller");
 
 // for admin
-//router.post("login", authController.adminLogin);
+router.post("/login", authController.adminLogin);
 router.post("/register", authController.adminRegister);
-//router.post("logout", authController.adminLogout);
+router.post("/logout", authController.logout);
 
 router.get(
   "/category/:categoryName",

@@ -97,8 +97,37 @@ const userLogin = async (userInfo) => {
   }
 };
 
+const adminLogin = async (userInfo) => {
+  const { username, password } = userInfo;
+  try {
+    const [user] = await db.query(
+      "SELECT * FROM users WHERE username = ? AND role = ?",
+      [username, "admin"]
+    );
+
+    if (!user.length) {
+      throw new Error("Username không tồn tại!");
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user[0].password);
+    if (!isPasswordValid) {
+      throw new Error("Mật khẩu không chính xác!");
+    }
+
+    const sessionToken = await generateSessionToken(user[0]);
+    return {
+      sessionToken,
+      userId: user[0].user_id
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 module.exports = {
   createUser,
   createAdmin,
   userLogin,
+  adminLogin,
 };
