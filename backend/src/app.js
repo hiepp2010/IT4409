@@ -6,7 +6,6 @@ const port = 3000;
 const app = express();
 const routes = require("./index");
 const expressSession = require("express-session");
-const { authMiddleware } = require("./middleware/auth.middleware");
 require("./db");
 
 // set security HTTP headers
@@ -23,7 +22,7 @@ app.use(
   })
 );
 
-app.use("/", authMiddleware, routes);
+app.use("/", routes);
 
 app.listen(port, () => {
   console.log(`Server đang chạy trên http://localhost:${port}`);
