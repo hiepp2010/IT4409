@@ -3,6 +3,7 @@
     "express": "^4.21.1",
     "helmet": "^8.0.0",
     "http-status": "^1.7.4",
+    "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "mysql2": "^3.11.3",
     "nodemon": "^3.1.7",

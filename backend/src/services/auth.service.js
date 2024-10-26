@@ -1,11 +1,10 @@
 const db = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const SECRET_KEY = "abcxyz123";
+const crypto = require("crypto");
 
 const createUser = async (userInfo, res) => {
   const { username, password, email, address, phoneNumber } = userInfo;
-  console.log(username);
 
   try {
     const [existingUsername] = await db.query(
@@ -55,6 +54,20 @@ const createAdmin = async (adminInfo, res) => {
     return res.status(500).json({ error: "Lưu dữ liệu thất bại" });
   }
 };
+const generateSessionToken = async (user) => {
+  const randomBytes = crypto.randomBytes(32);
+  const sessionId = randomBytes.toString("hex");
+
+  return jwt.sign(
+    {
+      sessionId,
+      userId: user.user_id,
+      role: user.role,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "24h" }
+  );
+};
 
 const userLogin = async (userInfo) => {
   const { username, password } = userInfo;
@@ -73,7 +86,11 @@ const userLogin = async (userInfo) => {
       throw new Error("Mật khẩu không chính xác!");
     }
 
-    return user[0].user_id;
+    const sessionToken = await generateSessionToken(user[0]);
+    return {
+      sessionToken,
+      userId: user[0].user_id
+    };
   } catch (error) {
     console.error(error);
     throw error;
