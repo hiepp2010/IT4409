@@ -7,7 +7,7 @@ const cartController = require("../controllers/cart.controller")
 // for customers
 router.post("/login", authController.userLogin);
 router.post("/register", authController.userRegister);
-//router.post("/logout", authController.userLogout);
+router.post("/logout", authController.logout);
 
 router.get(
   "/category/:categoryName",

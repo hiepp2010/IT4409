@@ -14,12 +14,30 @@ const adminRegister = async (req, res) => {
 const userLogin = async (req, res) => {
   const userInfo = req.body;
   try {
-    const { sessionToken, userId } = await authService.userLogin(userInfo);
-    res.cookie('session_token', sessionToken, {
+    const { sessionToken } = await authService.userLogin(userInfo);
+    res.cookie("session_token", sessionToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000 // 24h
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000, // 24h
+    });
+    res.status(200).json("Login successfully !");
+  } catch (error) {
+    console.error(error);
+    res.status(403).json("Login failed");
+  }
+};
+
+const adminLogin = async (req, res) => {
+  const userInfo = req.body;
+
+  try {
+    const { sessionToken } = await authService.adminLogin(userInfo);
+    res.cookie("session_token", sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000, // 24h
     });
     res.status(200).json("Login successfully !");
   } catch (error) {
@@ -29,14 +47,40 @@ const userLogin = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  req.session.destroy(() => {
-    res.status(200).json("You are logged out ! ");
-  });
+  try {
+    const sessionToken = req.cookies.session_token;
+
+    if (!sessionToken) {
+      return res.status(400).json({
+        error: "No active session",
+      });
+    }
+
+    await db.query("UPDATE sessions SET is_valid = false WHERE token = ?", [
+      sessionToken,
+    ]);
+
+    res.clearCookie("session_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    return res.status(200).json({
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    console.error("Logout error:", error);
+    return res.status(500).json({
+      error: "Error during logout",
+    });
+  }
 };
 
 module.exports = {
   userRegister,
   adminRegister,
   userLogin,
+  adminLogin,
   logout,
 };
