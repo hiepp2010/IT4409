@@ -1,5 +1,6 @@
 // app.js
 const express = require("express");
+require('dotenv').config();
 const helmet = require("helmet");
 const xss = require("xss-clean");
 const port = 3000;
