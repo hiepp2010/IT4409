@@ -4,6 +4,7 @@ const authController = require("../controllers/auth.controller");
 const categoryControllers = require("../controllers/category.controller");
 const productController = require("../controllers/product.controller");
 const cartController = require("../controllers/cart.controller")
+const orderManagementController = require("../controllers/orderManagement.controller")
 // for customers
 router.post("/login", authController.userLogin);
 router.post("/register", authController.userRegister);
@@ -22,4 +23,5 @@ router.post("/addToCart", cartController.addToCart);
 router.get('/getCart', cartController.getCart);
 
 // quản lý đơn hàng
+router.post("/order-management", orderManagementController.getOrderDetailForCustomer);
 module.exports = router;
