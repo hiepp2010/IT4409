@@ -14,17 +14,16 @@ const adminRegister = async (req, res) => {
 const userLogin = async (req, res) => {
   const userInfo = req.body;
   try {
-    const { sessionToken } = await authService.userLogin(userInfo);
+    const { sessionToken, userId } = await authService.userLogin(userInfo);
     res.cookie("session_token", sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       maxAge: 24 * 60 * 60 * 1000, // 24h
     });
-    res.status(200).json("Login successfully !");
+    res.status(200).json({ message: "Login successfully !", userId , sessionToken });
   } catch (error) {
-    console.error(error);
-    res.status(403).json("Login failed");
+    res.status(403).json({message: `${error}`});
   }
 };
 
@@ -39,10 +38,9 @@ const adminLogin = async (req, res) => {
       sameSite: "strict",
       maxAge: 24 * 60 * 60 * 1000, // 24h
     });
-    res.status(200).json("Login successfully !");
+    res.status(200).json({ message: "Login successfully !", userId , sessionToken });
   } catch (error) {
-    console.error(error);
-    res.status(403).json("Login failed");
+    res.status(403).json({message: `${error}`});
   }
 };
 

@@ -57,7 +57,6 @@ const createAdmin = async (adminInfo, res) => {
 const generateSessionToken = async (user) => {
   const randomBytes = crypto.randomBytes(32);
   const sessionId = randomBytes.toString("hex");
-
   return jwt.sign(
     {
       sessionId,
@@ -92,7 +91,6 @@ const userLogin = async (userInfo) => {
       userId: user[0].user_id
     };
   } catch (error) {
-    console.error(error);
     throw error;
   }
 };
@@ -120,7 +118,6 @@ const adminLogin = async (userInfo) => {
       userId: user[0].user_id
     };
   } catch (error) {
-    console.error(error);
     throw error;
   }
 };
