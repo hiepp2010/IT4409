@@ -74,20 +74,18 @@ const userLogin = async (userInfo) => {
       "SELECT * FROM users WHERE username = ? AND role = ?",
       [username, "customer"]
     );
-
-    if (!user.length) {
+    if (!user) {
       throw new Error("Username không tồn tại!");
     }
-
-    const isPasswordValid = await bcrypt.compare(password, user[0].password);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new Error("Mật khẩu không chính xác!");
     }
 
-    const sessionToken = await generateSessionToken(user[0]);
+    const sessionToken = await generateSessionToken(user);
     return {
       sessionToken,
-      userId: user[0].user_id
+      userId: user.user_id
     };
   } catch (error) {
     throw error;
