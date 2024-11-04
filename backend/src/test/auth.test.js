@@ -6,6 +6,8 @@ const db = require("../db");
 const mocha = require("mocha");
 const describe = mocha.describe;
 const authService = require("../services/auth.service");
+require("dotenv").config();
+
 function expectReject(promise) {
   return promise.then(
     (result) =>
@@ -20,13 +22,13 @@ describe("Authentication", async function () {
     db.run(
       `
           CREATE TABLE users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT,
-            password TEXT,
-            email TEXT,
-            role TEXT,
-            address TEXT,
-            phone_number TEXT
+            user_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            username VARCHAR(255) NOT NULL,
+            password VARCHAR(255) NOT NULL,
+            email VARCHAR(255) DEFAULT NULL,
+            role VARCHAR(255) NOT NULL DEFAULT 'customer' CHECK(role IN ('admin', 'customer')),
+            address TEXT NOT NULL,
+            phone_number VARCHAR(255) NOT NULL
           )
         `,
       done
@@ -39,38 +41,51 @@ describe("Authentication", async function () {
   });
   let username = "user1";
   let password = "123";
+  let wrongpassword = "1234";
   let email = "xuanhieu@gmail.com";
   let address = "Ha Noi";
   let phoneNumber = "0335142658";
   let userInfo = { username, password, email, address, phoneNumber };
   describe("functionally", async function () {
     it("create user without error", async function () {
-        const res = {
-            status: function (code) {
-              this.statusCode = code;
-              return this;
-            },
-            json: function (data) {
-              this.data = data;
-              return this;
-            },
-          };
+      const res = {
+        status: function (code) {
+          this.statusCode = code;
+          return this;
+        },
+        json: function (data) {
+          this.data = data;
+          return this;
+        },
+      };
       await authService.createUser(userInfo, res);
       expect(res.statusCode).to.be(201); // Kiểm tra mã trạng thái là 201
     });
     it("unable to create user with existed username", async function () {
-        const res = {
-            status: function (code) {
-              this.statusCode = code;
-              return this;
-            },
-            json: function (data) {
-              this.data = data;
-              return this;
-            },
-          };
-        await authService.createUser(userInfo, res);
-        expect(res.statusCode).to.be(400); // Kiểm tra mã trạng thái là 201
-    })
+      const res = {
+        status: function (code) {
+          this.statusCode = code;
+          return this;
+        },
+        json: function (data) {
+          this.data = data;
+          return this;
+        },
+      };
+      await authService.createUser(userInfo, res);
+      expect(res.statusCode).to.be(400); // Kiểm tra mã trạng thái là 201
+    });
+    it("login success", async function () {
+      const userInfo = { username, password };
+      await authService.userLogin(userInfo);
+    });
+    it("login failed with wrong password", async function () {
+      const userInfo = { username, password: wrongpassword };
+      try {
+        await authService.userLogin(userInfo);
+      } catch (error) {
+        expect(error.message).to.be("Mật khẩu không chính xác!");
+      }
+    });
   });
 });
