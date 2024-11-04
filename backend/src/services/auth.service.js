@@ -11,8 +11,7 @@ const createUser = async (userInfo, res) => {
       "SELECT * FROM users WHERE username = ?",
       [username]
     );
-
-    if (existingUsername.length) {
+    if (existingUsername) {
       return res.status(400).json({ message: "Username already exists!" });
     }
 
