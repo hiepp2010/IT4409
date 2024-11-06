@@ -26,6 +26,7 @@ app.use(
 app.use("/", routes);
 
 app.listen(port, () => {
+  // eslint-disable-next-line no-console
   console.log(`Server đang chạy trên http://localhost:${port}`);
 });
 
