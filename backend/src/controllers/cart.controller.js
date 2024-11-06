@@ -3,7 +3,7 @@ const addToCart = async (req, res) => {
   try {
     const userId = req.session.userId;
     const { productId, quantity } = req.body;
-    await cartService.addToCart(userId, productId, quantity);
+    await cartService.addToCart({ userId, productId, quantity });
     res.status(200).json("Add to cart successfully!");
   } catch {
     res.status(500).json("Failed to add to cart !");
