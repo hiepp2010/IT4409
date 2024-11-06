@@ -6,7 +6,6 @@ const getProductInfoByProductName = async (productName) => {
           "SELECT * FROM products WHERE product_name = ?",
           [productName]
         );
-        console.log(rows)
         return rows;
       } catch (error) {
         throw error;

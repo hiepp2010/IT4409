@@ -3,7 +3,7 @@ const db = require("../db");
 const addToCart = async ({ userId, productId, quantity }) => {
   const cartKey = `cart:${userId}:${productId}`;
   try {
-    await redisClient.setEx(cartKey, 86400, quantity.toString());
+    await redisClient.incrBy(cartKey, quantity);
   } catch {
     throw new Error("Can not save to redis");
   }
@@ -20,10 +20,8 @@ const getCart = async (userId) => {
       return;
     }
     for (const key of keys) {
-      console.log(key)
       const productId = key.split(":")[2];
       const quantity = await redisClient.get(key);
-
       if (!quantity || isNaN(quantity)) {
         continue;
       }
@@ -33,15 +31,12 @@ const getCart = async (userId) => {
       );
 
       if (existing) {
-        console.log(1);
         // Update the quantity if the record exists
         await db.query(
           "UPDATE shopping_cart SET quantity = quantity + ? WHERE customer_id = ? AND product_id = ?",
           [quantity, userId, productId]
         );
       } else {
-        console.log(2);
-
         // Insert a new record if it does not exist
         await db.query(
           "INSERT INTO shopping_cart (customer_id, product_id, quantity) VALUES (?, ?, ?)",
@@ -54,11 +49,9 @@ const getCart = async (userId) => {
       "SELECT * FROM shopping_cart WHERE customer_id = ?",
       [userId]
     );
-
-    console.log(result[0]);
     return result;
   } catch (error) {
-    // Log lỗi để debug
+    // eslint-disable-next-line no-console
     console.error("Error updating cart:", error);
     throw new Error("Failed to update cart!");
   }
