@@ -9,7 +9,8 @@ if (process.env.NODE_ENV === "test") {
     if (err) {
       console.error("Could not connect to SQLite in-memory database", err);
     } else {
-      console.log("Connected to SQLite in-memory database");
+      // eslint-disable-next-line no-console
+      console.info("Connected to SQLite in-memory database");
     }
   });
 
