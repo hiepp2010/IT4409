@@ -8,13 +8,6 @@ const describe = mocha.describe;
 const authService = require("../services/auth.service");
 require("dotenv").config();
 
-function expectReject(promise) {
-  return promise.then(
-    (result) =>
-      expect().fail(`Expected failure, but function returned ${result}`),
-    (error) => {}
-  );
-}
 
 describe("Authentication", async function () {
   before(function (done) {
