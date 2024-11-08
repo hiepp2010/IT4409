@@ -11,13 +11,6 @@ const request = require("supertest");
 const { addToCart, getCart } = require("../services/cart.service");
 require("dotenv").config();
 
-function expectReject(promise) {
-  return promise.then(
-    (result) =>
-      expect().fail(`Expected failure, but function returned ${result}`),
-    (error) => {}
-  );
-}
 
 describe("Order management", async function () {
   before(function (done) {
@@ -55,7 +48,8 @@ describe("Order management", async function () {
                   customer_id INTEGER NOT NULL,
                   product_id INTEGER NOT NULL,
                   quantity INTEGER NOT NULL,
-                  UNIQUE(customer_id, product_id)
+                  UNIQUE(customer_id, product_id),
+                  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
                 `,
               done

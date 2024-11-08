@@ -1,5 +1,4 @@
 const db = require("../db");
-const _ = require("lodash");
 const fetchItemByCategoryName = async (categoryName) => {
     const parentCategories = ["TOP", "BOTTOM", "ACCESSORIES", "SNEAKER", "NEWS"];
 
