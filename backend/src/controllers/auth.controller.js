@@ -1,4 +1,3 @@
-const httpStatus = require("http-status");
 const authService = require("../services/auth.service");
 
 const userRegister = async (req, res) => {

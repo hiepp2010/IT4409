@@ -1,6 +1,5 @@
 const db = require("../db");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
 
 const authMiddlewareForAdmin = async (req, res) => {
   try {
