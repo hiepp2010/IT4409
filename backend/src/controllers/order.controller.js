@@ -3,7 +3,15 @@ const PaymentController = require("./payment.controller"); // Import để gọi
 
 const createOrder = async (req, res) => {
   try {
-    const { customerId, items, totalAmount, paymentMethod } = req.body;
+    const {
+      customerId,
+      items,
+      totalAmount,
+      paymentMethod,
+      totalDiscount,
+      address,
+      phoneNumber,
+    } = req.body;
 
     // Tạo đơn hàng với trạng thái 'pending'
     const newOrder = await OrderService.createOrder({
@@ -11,6 +19,9 @@ const createOrder = async (req, res) => {
       items,
       totalAmount,
       paymentMethod,
+      totalDiscount,
+      address,
+      phoneNumber,
     });
 
     // Nếu là COD, trả về thông báo thành công, không cần gọi thanh toán
@@ -29,13 +40,11 @@ const createOrder = async (req, res) => {
 
     res.status(paymentResult.success ? 200 : 400).json(paymentResult);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Không thể đặt hàng.",
-        error: error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Không thể đặt hàng.",
+      error: error.message,
+    });
   }
 };
 

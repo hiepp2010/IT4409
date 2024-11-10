@@ -1,13 +1,23 @@
 const authService = require("../services/auth.service");
 
 const userRegister = async (req, res) => {
-  const userInfo = req.body;
-  await authService.createUser(userInfo, res);
+  try {
+    const userInfo = req.body;
+    await authService.createUser(userInfo);
+    res.status(200).json("Create user successfully!");
+  } catch (err) {
+    res.status(500).json(`Can not create user ${err.message}`);
+  }
 };
 
 const adminRegister = async (req, res) => {
-  const adminInfo = req.body;
-  await authService.createAdmin(adminInfo, res);
+  try {
+    const adminInfo = req.body;
+    await authService.createAdmin(adminInfo);
+    res.status(200).json("Create user successfully!");
+  } catch (err) {
+    res.status(500).json(`Can not create user ${err.message}`);
+  }
 };
 
 const userLogin = async (req, res) => {
@@ -20,9 +30,11 @@ const userLogin = async (req, res) => {
       sameSite: "strict",
       maxAge: 24 * 60 * 60 * 1000, // 24h
     });
-    res.status(200).json({ message: "Login successfully !", userId , sessionToken });
+    res
+      .status(200)
+      .json({ message: "Login successfully !", userId, sessionToken });
   } catch (error) {
-    res.status(403).json({message: `${error}`});
+    res.status(403).json({ message: `${error}` });
   }
 };
 
@@ -37,9 +49,11 @@ const adminLogin = async (req, res) => {
       sameSite: "strict",
       maxAge: 24 * 60 * 60 * 1000, // 24h
     });
-    res.status(200).json({ message: "Login successfully !", userId , sessionToken });
+    res
+      .status(200)
+      .json({ message: "Login successfully !", userId, sessionToken });
   } catch (error) {
-    res.status(403).json({message: `${error}`});
+    res.status(403).json({ message: `${error}` });
   }
 };
 

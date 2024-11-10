@@ -31,7 +31,10 @@ router.post(
   productController.editProduct
 );
 router.post("/product/deleteProduct", productController.deleteProduct);
-
+// lấy order detail với orderId được truyền trong params
+router.get('/orderDetail/:orderId', orderManagementController.getOrderDetailByOrderIdForAdmin);
 // api phân trang về các order gần nhất
 router.post("/lastest-order", orderManagementController.getLatestOrder);
+// api update status order
+router.post('/orderDetail/updateOrderStatus', orderManagementController.updateOrderStatus);
 module.exports = router;
