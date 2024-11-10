@@ -4,24 +4,31 @@ const redisClient = createClient({
   url: "redis://localhost:6379",
 });
 
-redisClient.on(
-  "error",
-  (
-    err // eslint-disable-next-line no-console
-  ) => console.log("Redis Client Error", err)
-);
+let isRedisConnected = false;
+let hasShownError = false;
+
+redisClient.on("error", () => {
+  if (!hasShownError) {
+    // eslint-disable-next-line no-console
+    console.log("Unable to connect to Redis");
+    hasShownError = true;
+  }
+});
 
 redisClient
   .connect()
   .then(() => {
+    isRedisConnected = true;
     // eslint-disable-next-line no-console
     console.log("Connected to Redis");
   })
-  .catch((err) => {
+  .catch(() => {
     // eslint-disable-next-line no-console
-    console.log("Redis connection failed", err);
+    console.log("Redis connection failed, continuing without Redis.");
+    isRedisConnected = false; // Đặt cờ nếu không kết nối được Redis
   });
 
 module.exports = {
   redisClient,
+  isRedisConnected,
 };
