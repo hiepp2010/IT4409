@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
-const createUser = async (userInfo, res) => {
+const createUser = async (userInfo) => {
   const { username, password, email, address, phoneNumber } = userInfo;
 
   try {
@@ -12,7 +12,7 @@ const createUser = async (userInfo, res) => {
       [username]
     );
     if (existingUsername) {
-      return res.status(400).json({ message: "Username already exists!" });
+      throw new Error("Existed user with the same username!");
     }
 
     const encryptedPassword = await bcrypt.hash(password, 10);
@@ -20,15 +20,12 @@ const createUser = async (userInfo, res) => {
       "INSERT INTO users (username, password, email, role, address, phone_number) VALUES (?, ?, ?, ?, ?, ?)",
       [username, encryptedPassword, email, "customer", address, phoneNumber]
     );
-
-    return res.status(201).json({ message: "User created successfully!" });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Lưu dữ liệu thất bại" });
+    throw new Error(error.message);
   }
 };
 
-const createAdmin = async (adminInfo, res) => {
+const createAdmin = async (adminInfo) => {
   const { username, password, email, address, phoneNumber } = adminInfo;
 
   try {
@@ -38,7 +35,7 @@ const createAdmin = async (adminInfo, res) => {
     );
 
     if (existingUsername.length) {
-      return res.status(400).json({ message: "Username already exists!" });
+      throw new Error("Existed user with the same username!");
     }
 
     const encryptedPassword = await bcrypt.hash(password, 10);
@@ -46,11 +43,8 @@ const createAdmin = async (adminInfo, res) => {
       "INSERT INTO users (username, password, email, role, address, phone_number) VALUES (?, ?, ?, ?, ?, ?)",
       [username, encryptedPassword, email, "admin", address, phoneNumber]
     );
-
-    return res.status(201).json({ message: "User created successfully!" });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Lưu dữ liệu thất bại" });
+    throw new Error(error.message);
   }
 };
 const generateSessionToken = async (user) => {
@@ -85,7 +79,7 @@ const userLogin = async (userInfo) => {
     const sessionToken = await generateSessionToken(user);
     return {
       sessionToken,
-      userId: user.user_id
+      userId: user.user_id,
     };
   } catch (error) {
     throw error;
@@ -112,7 +106,7 @@ const adminLogin = async (userInfo) => {
     const sessionToken = await generateSessionToken(user[0]);
     return {
       sessionToken,
-      userId: user[0].user_id
+      userId: user[0].user_id,
     };
   } catch (error) {
     throw error;
