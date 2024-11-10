@@ -51,7 +51,6 @@ const getCart = async (userId) => {
     );
     return result;
   } catch (error) {
-     // eslint-disable-next-line no-console
     console.error("Error updating cart:", error);
     throw new Error("Failed to update cart!");
   }
