@@ -12,7 +12,7 @@ const getProductInfoByProductName = async (productName) => {
   }
 };
 
-const createProduct = async (req) => {
+const createProduct = async ({ req, imagePath }) => {
   const {
     productName,
     description,
@@ -21,21 +21,20 @@ const createProduct = async (req) => {
     category,
     color,
     size,
-    image,
     skuCode,
-  } = req.body;
-
+  } = req;
+  imagePath = imagePath.replace(/\\/g, "/");
   try {
     const [existingProduct] = await db.query(
       "SELECT * FROM products WHERE skucode = ?",
       [skuCode]
     );
 
-    if (existingProduct.length > 0) {
+    if (!!existingProduct) {
       throw new Error("Existed products with the same skucode!");
     } else {
       await db.query(
-        "INSERT INTO products (product_name, description, price, stock_quantity, category, color, size, skucode, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO products (product_name, description, price, stock_quantity, category, color, size, skucode, image_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
           productName,
           description,
@@ -45,7 +44,7 @@ const createProduct = async (req) => {
           color,
           size,
           skuCode,
-          image,
+          imagePath,
         ]
       );
     }
@@ -54,7 +53,7 @@ const createProduct = async (req) => {
   }
 };
 
-const editProduct = async (req) => {
+const editProduct = async ({ req, imagePath }) => {
   const {
     productName,
     description,
@@ -63,24 +62,24 @@ const editProduct = async (req) => {
     category,
     color,
     size,
-    image,
     skuCode,
   } = req;
 
   try {
+    imagePath = imagePath.replace(/\\/g, "/");
     // Kiểm tra sản phẩm tồn tại
     const [existingProduct] = await db.query(
       "SELECT 1 FROM products WHERE skucode = ?",
       [skuCode]
     );
 
-    if (existingProduct.length === 0) {
+    if (!existingProduct) {
       throw new Error("Product with the corresponding SKU code does not exist");
     }
 
     // Cập nhật sản phẩm
     await db.query(
-      "UPDATE products SET product_name = ?, description = ?, price = ?, stock_quantity = ?, category = ?, color = ?, size = ?, image = ? WHERE skucode = ?",
+      "UPDATE products SET product_name = ?, description = ?, price = ?, stock_quantity = ?, category = ?, color = ?, size = ?, image_path = ? WHERE skucode = ?",
       [
         productName,
         description,
@@ -89,17 +88,17 @@ const editProduct = async (req) => {
         category,
         color,
         size,
-        image,
+        imagePath,
         skuCode,
       ]
     );
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error(`Failed to edit product: ${error.message}`);
   }
 };
 
 const deleteProduct = async (req) => {
-  const { skuCode } = req.body; // Chỉ cần `skuCode` để xác định sản phẩm cần xóa
+  const { skuCode } = req; // Chỉ cần `skuCode` để xác định sản phẩm cần xóa
 
   try {
     // Kiểm tra sản phẩm tồn tại
@@ -113,10 +112,7 @@ const deleteProduct = async (req) => {
     }
 
     // Xóa sản phẩm
-    await db.query(
-      "DELETE FROM products WHERE skucode = ?",
-      [skuCode]
-    );
+    await db.query("DELETE FROM products WHERE skucode = ?", [skuCode]);
   } catch (error) {
     throw new Error(error.message);
   }
