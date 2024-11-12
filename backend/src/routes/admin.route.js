@@ -32,12 +32,27 @@ router.post(
 );
 router.post("/product/deleteProduct", productController.deleteProduct);
 // lấy order detail với orderId được truyền trong params
-router.get('/orderDetail/:orderId', orderManagementController.getOrderDetailByOrderIdForAdmin);
+router.get(
+  "/orderDetail/:orderId",
+  orderManagementController.getOrderDetailByOrderIdForAdmin
+);
 // api phân trang về các order gần nhất
 router.post("/lastest-order", orderManagementController.getLatestOrder);
 // api update status order
-router.post('/orderDetail/updateOrderStatus', orderManagementController.updateOrderStatus);
+router.post(
+  "/orderDetail/updateOrderStatus",
+  orderManagementController.updateOrderStatus
+);
 
 // api get 10 best seller với optionType gồm [week, month, year]
-router.get('/get-best-sellers/:timeFilter', orderManagementController.getBestSellers);
+router.get(
+  "/get-best-sellers/:timeFilter",
+  orderManagementController.getBestSellers
+);
+
+// get revenue 10 mốc gần nhất
+router.get(
+  "/get-revenue/:timeFilter",
+  orderManagementController.getRevenueStatistics
+);
 module.exports = router;
