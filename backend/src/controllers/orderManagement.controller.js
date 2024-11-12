@@ -65,6 +65,20 @@ const getRevenueStatistics = async (req, res) => {
       .json({ error: `Get revenue statistics failed !: ${err.message}` });
   }
 };
+
+const getOrderStatistics = async (req, res) => {
+  const { timeFilter } = req.params;
+  try {
+    const result = await orderManagementService.getOrderStatistics(
+      timeFilter
+    );
+    res.status(200).json(result);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: `Get order statistics failed !: ${err.message}` });
+  }
+};
 module.exports = {
   getOrderDetailForCustomer,
   getLatestOrder,
@@ -72,4 +86,5 @@ module.exports = {
   updateOrderStatus,
   getBestSellers,
   getRevenueStatistics,
+  getOrderStatistics,
 };

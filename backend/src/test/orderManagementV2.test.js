@@ -190,5 +190,9 @@ describe("Order management", async function () {
     it("get revenue statistics successfully!", async () => {
       await request(app).get("/admin/get-revenue/week").expect(200);
     });
+
+    it("get order statistics report", async () => {
+      await request(app).get("/admin/order-statistics/week").expect(200);
+    });
   });
 });
