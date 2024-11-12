@@ -93,7 +93,7 @@ describe("Order management", async function () {
       .attach("image", imagePath2)
       .expect(200); // Gửi file ảnh
 
-      await request(app)
+    await request(app)
       .post("/admin/product/createProduct")
       .field("productName", product2.productName)
       .field("price", product2.price)
@@ -148,42 +148,47 @@ describe("Order management", async function () {
     size: "L",
     skuCode: "XLXX1",
   };
-  const imagePath1 = "C:\\Users\\Admin\\Downloads\\8e5e27b7-da0a-43b2-938e-dc410c5c5eee.jfif";
+  const imagePath1 =
+    "C:\\Users\\Admin\\Downloads\\8e5e27b7-da0a-43b2-938e-dc410c5c5eee.jfif";
   const imagePath2 = "C:\\Users\\Admin\\Downloads\\IMG_9037 (1).jpg";
-  
+
   describe("functionally", async function () {
     it("get best seller succesfully!", async () => {
-        const { userId } = await authService.userLogin(userInfo2);
-        let orderRequest = {
-          customerId: userId,
-          items: [
-            {
-              productId: product1.productId,
-              quantity: 229,
-              price: product1.price,
-            },
-            {
-                productId: product2.productId,
-                quantity: 1000,
-                price: product1.price,
-              },
-          ],
-          totalAmount: product1.price * 229,
-          paymentMethod: "cod",
-        };
-        let orderDetail = await request(app)
-          .post("/orders/create")
-          .send(orderRequest)
-          .expect(200);
-        let updateOrderStatusRequest = {
-          orderId: orderDetail._body.data.id,
-          status: "completed",
-        };
-        await request(app)
-          .post("/admin/orderDetail/updateOrderStatus")
-          .send(updateOrderStatusRequest)
-          .expect(200);
-        await request(app).get(`/admin/get-best-sellers/week}`).expect(200);
-      });
+      const { userId } = await authService.userLogin(userInfo2);
+      let orderRequest = {
+        customerId: userId,
+        items: [
+          {
+            productId: product1.productId,
+            quantity: 229,
+            price: product1.price,
+          },
+          {
+            productId: product2.productId,
+            quantity: 1000,
+            price: product1.price,
+          },
+        ],
+        totalAmount: product1.price * 229,
+        paymentMethod: "cod",
+      };
+      let orderDetail = await request(app)
+        .post("/orders/create")
+        .send(orderRequest)
+        .expect(200);
+      let updateOrderStatusRequest = {
+        orderId: orderDetail._body.data.id,
+        status: "completed",
+      };
+      await request(app)
+        .post("/admin/orderDetail/updateOrderStatus")
+        .send(updateOrderStatusRequest)
+        .expect(200);
+      await request(app).get(`/admin/get-best-sellers/week`).expect(200);
+    });
+
+    it("get revenue statistics successfully!", async () => {
+      await request(app).get("/admin/get-revenue/week").expect(200);
+    });
   });
 });
