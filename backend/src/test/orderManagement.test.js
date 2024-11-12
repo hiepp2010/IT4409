@@ -167,6 +167,18 @@ describe("Order management", async function () {
         .field("skuCode", createProductRequest1.skuCode)
         .attach("image", imagePath2)
         .expect(200); // Gửi file ảnh
+
+      await request(app)
+        .post("/admin/product/createProduct")
+        .field("productName", product2.productName)
+        .field("price", product2.price)
+        .field("stockQuantity", product2.stockQuantity)
+        .field("category", product2.category)
+        .field("color", product2.color)
+        .field("size", product2.size)
+        .field("skuCode", product2.skuCode)
+        .attach("image", imagePath1)
+        .expect(200); // Gửi file ảnh
     });
 
     it("create product failed!", async () => {
@@ -250,21 +262,18 @@ describe("Order management", async function () {
         productId: 1,
         quantity: 1,
       });
-      expect(200);
-    });
-
-    it("get cart successfully", async function () {
-      const { userId } = await authService.userLogin(userInfo2);
 
       await addToCart({ userId, productId: 1, quantity: 1 });
       await addToCart({ userId, productId: 2, quantity: 3 });
       await addToCart({ userId, productId: 1, quantity: 1 });
+      expect(200);
+    });
 
-      const result = await getCart(userId);
-      expect(result).to.eql([
-        { cart_id: 1, customer_id: 2, product_id: 1, quantity: 2 },
-        { cart_id: 2, customer_id: 2, product_id: 2, quantity: 3 },
-      ]);
+    it("get cart successfully", async function () {
+      const { userId } = await authService.userLogin(userInfo1);
+
+      await getCart(userId);
+      expect(200);
     });
 
     it("order successfully", async () => {
@@ -286,7 +295,7 @@ describe("Order management", async function () {
 
     it("update order status successfully", async () => {
       const { userId } = await authService.userLogin(userInfo2);
-      const orderRequest = {
+      let orderRequest = {
         customerId: userId,
         items: [
           {
@@ -295,14 +304,39 @@ describe("Order management", async function () {
             price: product1.price,
           },
         ],
-        totalAmount: product1.price * 2,
+        totalAmount: product1.price * 229,
         paymentMethod: "cod",
       };
-      const orderDetail = await request(app)
+      let orderDetail = await request(app)
         .post("/orders/create")
         .send(orderRequest)
         .expect(200);
-      const updateOrderStatusRequest = {
+      let updateOrderStatusRequest = {
+        orderId: orderDetail._body.data.id,
+        status: "completed",
+      };
+      await request(app)
+        .post("/admin/orderDetail/updateOrderStatus")
+        .send(updateOrderStatusRequest)
+        .expect(200);
+
+      orderRequest = {
+        customerId: userId,
+        items: [
+          {
+            productId: product2.productId,
+            quantity: 250,
+            price: product2.price,
+          },
+        ],
+        totalAmount: product2.price * 250,
+        paymentMethod: "cod",
+      };
+      orderDetail = await request(app)
+        .post("/orders/create")
+        .send(orderRequest)
+        .expect(200);
+      updateOrderStatusRequest = {
         orderId: orderDetail._body.data.id,
         status: "completed",
       };

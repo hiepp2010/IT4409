@@ -48,8 +48,14 @@ const createOrder = async ({
   // Lưu từng mục trong đơn hàng vào bảng order_items
   for (const item of items) {
     await db.query(
-      "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)",
-      [orderId, item.productId, item.quantity, item.price]
+      "INSERT INTO order_items (order_id, product_id, quantity, price, payment_amount) VALUES (?, ?, ?, ?, ?)",
+      [
+        orderId,
+        item.productId,
+        item.quantity,
+        item.price,
+        item.price * item.quantity,
+      ]
     );
   }
 
