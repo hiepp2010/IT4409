@@ -38,9 +38,22 @@ const updateOrderStatus = async (req, res) => {
       .json({ error: `Update order status failed !: ${err.message}` });
   }
 };
+
+const getBestSellers = async (req, res) => {
+  try {
+    const { timeFilter } = req.params;
+    await orderManagementService.getBestSellers(timeFilter);
+    res.status(200).json("Get best sellers successfully!");
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: `Get best sellers failed !: ${err.message}` });
+  }
+};
 module.exports = {
   getOrderDetailForCustomer,
   getLatestOrder,
   getOrderDetailByOrderIdForAdmin,
   updateOrderStatus,
+  getBestSellers,
 };
