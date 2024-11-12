@@ -42,12 +42,27 @@ const updateOrderStatus = async (req, res) => {
 const getBestSellers = async (req, res) => {
   try {
     const { timeFilter } = req.params;
-    await orderManagementService.getBestSellers(timeFilter);
-    res.status(200).json("Get best sellers successfully!");
+    const result = await orderManagementService.getBestSellers(timeFilter);
+    res.status(200).json(result);
   } catch (err) {
+    console.error(err);
     res
       .status(500)
       .json({ error: `Get best sellers failed !: ${err.message}` });
+  }
+};
+
+const getRevenueStatistics = async (req, res) => {
+  const { timeFilter } = req.params;
+  try {
+    const results = await orderManagementService.getRevenueStatistics(
+      timeFilter
+    );
+    res.status(200).json(results);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: `Get revenue statistics failed !: ${err.message}` });
   }
 };
 module.exports = {
@@ -56,4 +71,5 @@ module.exports = {
   getOrderDetailByOrderIdForAdmin,
   updateOrderStatus,
   getBestSellers,
+  getRevenueStatistics,
 };
