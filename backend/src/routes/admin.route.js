@@ -55,4 +55,6 @@ router.get(
   "/get-revenue/:timeFilter",
   orderManagementController.getRevenueStatistics
 );
+
+router.get("/order-statistics/:timeFilter", orderManagementController.getOrderStatistics)
 module.exports = router;
