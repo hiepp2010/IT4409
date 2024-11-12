@@ -53,9 +53,51 @@ const updateOrderStatus = async (orderId, status) => {
   }
 };
 
+const getBestSellers = async (timeFilter) => {
+  let timeCondition = "";
+  if (timeFilter === "week") {
+    timeCondition = "AND o.created_at >= NOW() - INTERVAL '1 week'";
+  } else if (timeFilter === "month") {
+    timeCondition = "AND o.created_at >= NOW() - INTERVAL '1 month'";
+  } else if (timeFilter === "year") {
+    timeCondition = "AND o.created_at >= NOW() - INTERVAL '1 year'";
+  }
+
+  const query = `
+     SELECT 
+    oi.product_id, 
+    oi.price,
+    p.product_name,
+    p.skucode,
+    SUM(oi.quantity) AS total_quantity
+    FROM 
+    order_items oi
+    JOIN 
+    orders o ON oi.order_id = o.order_id
+    JOIN 
+    products p ON oi.product_id = p.product_id
+    WHERE 
+    o.status = 'completed'
+    ${timeCondition}
+    GROUP BY 
+    oi.product_id, oi.price, p.product_name, p.skucode
+    ORDER BY 
+    total_quantity DESC
+    LIMIT 10;
+  `;
+
+  try {
+    const result = await db.query(query); // `db` là đối tượng kết nối cơ sở dữ liệu
+    return result;
+  } catch (error) {
+    throw new Error("Error fetching top best sellers:", error);
+  }
+};
+
 module.exports = {
   getOrderDetailForCustomer,
   getLatestOrder,
   getOrderDetailByOrderIdForAdmin,
   updateOrderStatus,
+  getBestSellers,
 };

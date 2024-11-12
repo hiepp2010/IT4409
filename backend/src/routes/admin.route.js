@@ -37,4 +37,7 @@ router.get('/orderDetail/:orderId', orderManagementController.getOrderDetailByOr
 router.post("/lastest-order", orderManagementController.getLatestOrder);
 // api update status order
 router.post('/orderDetail/updateOrderStatus', orderManagementController.updateOrderStatus);
+
+// api get 10 best seller với optionType gồm [week, month, year]
+router.get('/get-best-sellers/:timeFilter', orderManagementController.getBestSellers);
 module.exports = router;
