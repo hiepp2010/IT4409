@@ -2,8 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
-import { Heart, ChevronDown, Search, ShoppingCart, User } from 'lucide-react'
+import { Heart} from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
