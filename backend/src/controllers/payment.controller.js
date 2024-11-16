@@ -1,5 +1,6 @@
 const PaymentService = require("../services/payment.service");
 const db = require("../db");
+require("dotenv").config();
 
 const initiatePayment = async (req, res) => {
   const { paymentMethod, orderId, amount } = req.body;
@@ -43,4 +44,19 @@ const initiatePayment = async (req, res) => {
   }
 };
 
-module.exports = { initiatePayment };
+const createPaymentUrl = async (req, res, next) => {
+  const ipAddr =
+    req.headers["x-forwarded-for"] ||
+    req.connection.remoteAddress ||
+    req.socket.remoteAddress ||
+    req.connection.socket.remoteAddress;
+
+    const date = new Date();
+    const createDate = date.format('yyyymmddHHmmss')
+    const orderId = date.format('HHmmss')
+    const amount = req.body.amount;
+    const bankCode = req.body.bankCode;
+    const orderInfo = 
+};
+
+module.exports = { initiatePayment, createPaymentUrl };
