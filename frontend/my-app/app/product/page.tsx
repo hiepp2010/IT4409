@@ -3,9 +3,8 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ChevronDown, ChevronLeft, ChevronRight, Heart, Search, ShoppingCart, User } from 'lucide-react'
+import { ChevronLeft, ChevronRight} from 'lucide-react'
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import NavBar from '../navbar'
 import Footer from '../footer'
 import {
