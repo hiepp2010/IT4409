@@ -121,7 +121,7 @@ const deleteProduct = async (req) => {
 // Tìm sản phẩm theo tên
 const findProductByName = async (productName) => {
   try {
-      const [rows] = await pool.query('SELECT * FROM products WHERE name = ?', [productName]);
+      const [rows] = await db.query('SELECT * FROM products WHERE product_name = ?', [productName]);
       return rows[0]; // Trả về sản phẩm đầu tiên
   } catch (error) {
       throw error;
