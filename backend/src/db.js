@@ -30,9 +30,9 @@ if (process.env.NODE_ENV === "test") {
   // Sử dụng MySQL cho các môi trường khác
   const pool = mysql.createPool({
     host: "localhost",
-    port: 3307,
+    port: 3306,
     user: "root",
-    password: "",
+    password: "1234",
     database: "fashion_web",
     connectionLimit: 10
   });

@@ -51,7 +51,7 @@ const createOrder = async (req, res) => {
 const getOrderById = async (req, res) => {
   try {
       const { orderId } = req.params;
-      const order = await orderService.findOrderById(orderId);
+      const order = await OrderService.findOrderById(orderId);
       if (!order) {
           return res.status(404).json({ message: 'Order not found' });
       }
