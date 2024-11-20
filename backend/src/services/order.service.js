@@ -62,6 +62,17 @@ const createOrder = async ({
   // Trả về chi tiết đơn hàng
   return { id: orderId, customerId, totalAmount, paymentMethod, items };
 };
+
+const findOrderById = async (orderId) => {
+  try {
+      const [rows] = await pool.query('SELECT * FROM orders WHERE id = ?', [orderId]);
+      return rows[0]; // Trả về đơn hàng đầu tiên
+  } catch (error) {
+      throw error;
+  }
+};
+
 module.exports = {
   createOrder,
+  findOrderById,
 };
