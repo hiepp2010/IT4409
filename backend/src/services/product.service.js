@@ -118,9 +118,20 @@ const deleteProduct = async (req) => {
   }
 };
 
+// Tìm sản phẩm theo tên
+const findProductByName = async (productName) => {
+  try {
+      const [rows] = await pool.query('SELECT * FROM products WHERE name = ?', [productName]);
+      return rows[0]; // Trả về sản phẩm đầu tiên
+  } catch (error) {
+      throw error;
+  }
+};
+
 module.exports = {
   getProductInfoByProductName,
   createProduct,
   editProduct,
   deleteProduct,
+  findProductByName,
 };
