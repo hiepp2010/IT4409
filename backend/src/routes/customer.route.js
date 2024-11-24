@@ -25,5 +25,8 @@ router.get('/getCart', cartController.getCart);
 
 // quản lý đơn hàng
 router.get("/order-management", orderManagementController.getOrderDetailForCustomer);
+
 router.get('/', customerController.getAllCustomers);
+
+router.get('/:userId/details', customerController.getCustomerDetails);
 module.exports = router;

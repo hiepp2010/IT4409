@@ -11,7 +11,18 @@ const getAllCustomers = async (req, res) => {
     }
 };
 
+const getCustomerDetails = async (req, res) => {
+    try {
+        const { userId } = req.params; // Lấy userId từ request params
+        const customerDetails = await customerService.getCustomerDetails(userId);
+        res.status(200).json(customerDetails);
+    } catch (error) {
+        console.error('Error in controller:', error);
+        res.status(500).json({ message: 'Đã có lỗi xảy ra', error: error.message });
+    }
+};
 
 module.exports = {
-    getAllCustomers
+    getAllCustomers,
+    getCustomerDetails,
 }
