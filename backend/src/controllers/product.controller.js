@@ -58,14 +58,40 @@ const deleteProduct = async (req, res) => {
 
 const getProductByName = async (req, res) => {
   try {
-      const { productName } = req.params;
-      const product = await productService.findProductByName(productName);
-      if (!product) {
-          return res.status(404).json({ message: 'Product not found' });
-      }
-      res.status(200).json(product);
+    const { productName } = req.params;
+    const product = await productService.findProductByName(productName);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json(product);
   } catch (error) {
-      res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+const getProductReview = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const { productReviews, averageRating } = await productService.getProductReview(productId);
+    res.status(200).json({ productReviews, averageRating });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const uploadProductReview = async (req, res) => {
+  try {
+    const { productId, rating, reviewText, reviewDate, customerId } = req.body;
+    await productService.uploadProductReview(
+      productId,
+      rating,
+      reviewText,
+      reviewDate,
+      customerId
+    );
+    res.status(200).json("Upload product review successfully!");
+  } catch (err) {
+    res.status(500).json({ err: err.message });
   }
 };
 
@@ -75,4 +101,6 @@ module.exports = {
   editProduct,
   deleteProduct,
   getProductByName,
+  getProductReview,
+  uploadProductReview,
 };
