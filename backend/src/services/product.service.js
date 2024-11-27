@@ -121,17 +121,63 @@ const deleteProduct = async (req) => {
 // Tìm sản phẩm theo tên
 const findProductByName = async (productName) => {
   try {
-      const [rows] = await db.query('SELECT * FROM products WHERE product_name = ?', [productName]);
-      return rows[0]; // Trả về sản phẩm đầu tiên
+    const [rows] = await db.query(
+      "SELECT * FROM products WHERE product_name = ?",
+      [productName]
+    );
+    return rows[0]; // Trả về sản phẩm đầu tiên
   } catch (error) {
-      throw error;
+    throw error;
   }
 };
 
+const getProductReview = async (productId) => {
+  try {
+    let averageRating = 0; // Khởi tạo giá trị trung bình
+    const [productReviews] = await db.query(
+      "SELECT * FROM product_reviews WHERE product_id = ?",
+      [productId]
+    );
+
+    if (!productReviews || productReviews.length === 0) {
+      return { productReviews: [], averageRating }; // Nếu không có đánh giá, trả về mảng rỗng và rating bằng 0
+    }
+
+    let totalProductReviewsSum = 0;
+    for (const productReview of productReviews) {
+      totalProductReviewsSum += productReview.rating;
+    }
+
+    // Tính toán rating trung bình
+    averageRating = (totalProductReviewsSum / productReviews.length).toFixed(1);
+    return { productReviews, averageRating }; // Trả về cả reviews và averageRating
+  } catch (error) {
+    throw error;
+  }
+};
+
+const uploadProductReview = async (
+  productId,
+  rating,
+  reviewText,
+  reviewDate,
+  customerId
+) => {
+  try {
+    await db.query(
+      "INSERT INTO product_reviews (product_id, customer_id, rating, review_text, review_date) VALUES (?, ?, ?, ?, ?)",
+      [productId, customerId, rating, reviewText, reviewDate]
+    );
+  } catch (err) {
+    throw err;
+  }
+};
 module.exports = {
   getProductInfoByProductName,
   createProduct,
   editProduct,
   deleteProduct,
   findProductByName,
+  getProductReview,
+  uploadProductReview,
 };
