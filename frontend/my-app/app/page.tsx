@@ -1,6 +1,6 @@
 "use client"
 
-import NavBar from "./navbar"
+import NavBar from "./component/navbar"
 import GreyBCarousel from "./carousel"
 import Category from "./category"
 import Product from "./product"

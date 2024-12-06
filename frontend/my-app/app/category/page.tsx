@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 
-import NavBar from '../navbar'
+import NavBar from '../component/navbar'
 import Footer from '../footer'
 import {
   Select,
