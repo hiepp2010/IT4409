@@ -1,23 +1,20 @@
 "use client"
 
-import NavBar from "./component/navbar"
-import GreyBCarousel from "./carousel"
+import GreyBCarousel from "./component/carousel"
 import Category from "./category"
-import Product from "./product"
-import Footer from "./footer"
+import Product from "./component/product"
+import { getProducts } from "@/lib/product"
 
-export default function Page(){
+export default async function Page(){
+  const products = await getProducts()
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="sticky top-0 z-50 bg-grey shadow-md">
-        <NavBar></NavBar>
-      </header>
+    
       <main className="flex-grow">
         <GreyBCarousel />
         <Category/>
-        <Product></Product>
+        <Product products ={products}></Product>
       </main>
-      <Footer></Footer>
     </div>
   )
 

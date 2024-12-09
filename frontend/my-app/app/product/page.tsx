@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight} from 'lucide-react'
 import { Button } from "@/components/ui/button"
-import NavBar from '../navbar'
+import NavBar from '../component/navbar'
 import Footer from '../footer'
 import {
   Accordion,
