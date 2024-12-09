@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import Image from 'next/image'
 import NavItem from "./nav-item"
 import { Button } from "@/components/ui/button"
@@ -46,10 +47,12 @@ export default function NavBar() {
                 className="pl-10 pr-4 py-2 w-full md:w-64 rounded-full border-gray-300 focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
               />
             </div>
+            <Link href={`/cart`} className="block">
             <Button variant="ghost" size="icon" className="relative">
               <ShoppingCart className="h-5 w-5" />
               <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">{getCartCount()}</span>
             </Button>
+            </Link>
             <Button variant="ghost" size="icon">
               <User className="h-5 w-5" />
             </Button>

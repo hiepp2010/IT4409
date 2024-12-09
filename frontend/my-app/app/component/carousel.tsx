@@ -11,7 +11,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel"
 import { Card, CardContent } from "@/components/ui/card"
-import "./grey-b-carousel.css"
+// import "./grey-b-carousel.css"
 
 const carouselItems = [
   { image: "https://pos.nvncdn.com/be5dfe-25943/bn/20241024_tG0bXnUl.gif", alt: "Model wearing grey hoodie and blue jeans" },
