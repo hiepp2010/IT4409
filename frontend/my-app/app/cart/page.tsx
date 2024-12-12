@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function CartPage() {
-  const { items, removeItem, adjustQuantity, clearCart } = useCart()
+  const { items, removeItem, adjustQuantity } = useCart()
   const [isSticky, setIsSticky] = useState(false)
 
   const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
