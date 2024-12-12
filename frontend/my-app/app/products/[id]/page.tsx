@@ -24,7 +24,13 @@ import {
 } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 
-export default function ProductPage({ params }: { params: { id: string } }) {
+interface ProductPageProps {
+  params: {
+    id: string
+  }
+}
+
+export default function ProductPage({ params }: ProductPageProps) {
   const [product, setProduct] = useState<Product | null>(null)
   const [selectedColor, setSelectedColor] = useState<Color | null>(null)
   const [selectedSize, setSelectedSize] = useState<Size | null>(null)
