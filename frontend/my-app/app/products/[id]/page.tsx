@@ -24,30 +24,31 @@ import {
 } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 
-interface ProductPageProps {
-  params: {
-    id: string
-  }
-}
+type ProductPageProps = Promise<{
+  id:string
+}>
 
-export default function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage({params}: { params: ProductPageProps }) {
   const [product, setProduct] = useState<Product | null>(null)
   const [selectedColor, setSelectedColor] = useState<Color | null>(null)
   const [selectedSize, setSelectedSize] = useState<Size | null>(null)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const { addItem } = useCart()
   const {toast} = useToast()
+  const id = (await params).id
+
+
 
   useEffect(() => {
     async function fetchProduct() {
-      const fetchedProduct = await getProductById(params.id)
+      const fetchedProduct = await getProductById(id)
       if (fetchedProduct) {
         setProduct(fetchedProduct)
         setSelectedColor(fetchedProduct.color[0])
       }
     }
     fetchProduct()
-  }, [params.id])
+  }, [(await params).id])
 
   useEffect(() => {
     if (selectedColor) {
