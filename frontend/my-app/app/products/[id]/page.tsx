@@ -39,8 +39,6 @@ export default  function ProductPage(props: { params: ProductPageProps }) {
   const params = use(props.params)
   const id = params.id
 
-
-
   useEffect(() => {
     async function fetchProduct() {
       const fetchedProduct = await getProductById(id)
