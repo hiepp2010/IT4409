@@ -13,6 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+
 import { getProductById, Product, Color, Size } from '@/lib/product'
 import { useCart } from '@/app/contexts/CartContext'
 import { 
