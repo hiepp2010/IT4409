@@ -3,20 +3,36 @@ const OrderService = require("../services/order.service");
 const createOrder = async (req, res) => {
   try {
     const orderData = req.body;
-    // Extract IP Address
+    const {
+      customer_id,
+      payment_method,
+      total_amount,
+    } = orderData;
+
+
     const ipAddr =
       req.headers["x-forwarded-for"] ||
       req.connection?.remoteAddress ||
       req.socket?.remoteAddress ||
       req.connection?.socket?.remoteAddress ||
       "127.0.0.1";
-    // Gọi service để xử lý logic tạo đơn hàng
-    const result = await OrderService.createOrder(orderData, ipAddr);
 
-    res.status(201).json({
-      message: "Đơn hàng tạo thành công.",
-      orderNo: result.orderNo,
-    });
+    const result = await OrderService.createOrder(orderData, ipAddr);
+    if (payment_method === "COD") {
+      res.status(201).json({
+        message: "Đơn hàng tạo thành công.",
+        orderNo: result.orderNo,
+      });
+    }
+
+    if (payment_method === "VNPAY") {
+      const paymentUrl = await OrderService.paymentWithVnpay({
+        total_amount,
+        customer_id,
+        ipAddr,
+      });
+      res.redirect(paymentUrl);
+    }
   } catch (error) {
     console.error("Error in createOrder:", error);
     res.status(500).json({

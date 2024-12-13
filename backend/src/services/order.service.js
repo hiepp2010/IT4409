@@ -12,7 +12,7 @@ const _sortObject = (obj) => {
   return sorted;
 };
 
-const _paymentWithVnpay = async ({ total_amount, customer_id, ipAddr }) => {
+const paymentWithVnpay = async ({ total_amount, customer_id, ipAddr }) => {
   try {
     const tmnCode = "N9ZU3Q90"; // Replace with your actual TMN code
     const secretKey = "G15YSOY3R1T0O7LNCPUXY9K6D1KEF48K"; // Replace with your actual secret key
@@ -115,7 +115,7 @@ const getPaymentResponseByIPNFromVnpay = async (req) => {
   }
 };
 
-const createOrder = async (orderData, ipAddr) => {
+const createOrder = async (orderData) => {
   const {
     customer_id,
     phone_number,
@@ -148,9 +148,6 @@ const createOrder = async (orderData, ipAddr) => {
   let connection;
 
   try {
-    if (payment_method === "VNPAY") {
-      await _paymentWithVnpay({ total_amount, customer_id, ipAddr });
-    }
     connection = await db.getConnection();
     await connection.beginTransaction();
 
@@ -221,6 +218,6 @@ const findOrderById = async (orderId) => {
 module.exports = {
   createOrder,
   findOrderById,
-  _paymentWithVnpay,
+  paymentWithVnpay,
   getPaymentResponseByIPNFromVnpay,
 };
