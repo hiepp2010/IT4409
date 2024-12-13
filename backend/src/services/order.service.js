@@ -12,20 +12,12 @@ const _sortObject = (obj) => {
   return sorted;
 };
 
-const _paymentWithVnpay = async ({ total_amount, customer_id, req }) => {
+const _paymentWithVnpay = async ({ total_amount, customer_id, ipAddr }) => {
   try {
-    // Extract IP Address
-    const ipAddr =
-      req.headers["x-forwarded-for"] ||
-      req.connection?.remoteAddress ||
-      req.socket?.remoteAddress ||
-      req.connection?.socket?.remoteAddress ||
-      "127.0.0.1";
-
     const tmnCode = "N9ZU3Q90"; // Replace with your actual TMN code
     const secretKey = "G15YSOY3R1T0O7LNCPUXY9K6D1KEF48K"; // Replace with your actual secret key
     const vnpUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    const returnUrl = "https://www.messenger.com/e2ee/t/9032429510123061"; // TODO
+    const returnUrl = "https://it-4409-hjva.vercel.app";
 
     // Generate timestamps
     const date = moment();
@@ -33,8 +25,8 @@ const _paymentWithVnpay = async ({ total_amount, customer_id, req }) => {
     const orderId = date.format("HHMMss");
 
     const amount = total_amount; // Assuming total_amount is in VND
-    const orderInfo = `Thanh toan cho khach hang ${customer_id}`;
-    const orderType = "200000"; // Replace with appropriate order type code
+    const orderInfo = `Thanh toan cho khach hang ${customer_id} gia tri ${total_amount}`;
+    const orderType = "200000"; // mặt hàng thời trang
     const locale = "vn"; // Locale (e.g., "vn" for Vietnamese)
     const currCode = "VND"; // Currency code
 
@@ -64,7 +56,6 @@ const _paymentWithVnpay = async ({ total_amount, customer_id, req }) => {
     const paymentUrl = `${vnpUrl}?${querystring.stringify(vnp_Params, {
       encode: false,
     })}`;
-
     return paymentUrl; // Return the generated VNPay payment URL
   } catch (error) {
     console.error("Error in _paymentWithVnpay:", error);
@@ -124,7 +115,7 @@ const getPaymentResponseByIPNFromVnpay = async (req) => {
   }
 };
 
-const createOrder = async (orderData) => {
+const createOrder = async (orderData, ipAddr) => {
   const {
     customer_id,
     phone_number,
@@ -158,7 +149,7 @@ const createOrder = async (orderData) => {
 
   try {
     if (payment_method === "VNPAY") {
-      await _paymentWithVnpay({ total_amount });
+      await _paymentWithVnpay({ total_amount, customer_id, ipAddr });
     }
     connection = await db.getConnection();
     await connection.beginTransaction();

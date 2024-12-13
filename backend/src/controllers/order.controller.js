@@ -3,9 +3,15 @@ const OrderService = require("../services/order.service");
 const createOrder = async (req, res) => {
   try {
     const orderData = req.body;
-
+    // Extract IP Address
+    const ipAddr =
+      req.headers["x-forwarded-for"] ||
+      req.connection?.remoteAddress ||
+      req.socket?.remoteAddress ||
+      req.connection?.socket?.remoteAddress ||
+      "127.0.0.1";
     // Gọi service để xử lý logic tạo đơn hàng
-    const result = await OrderService.createOrder(orderData);
+    const result = await OrderService.createOrder(orderData, ipAddr);
 
     res.status(201).json({
       message: "Đơn hàng tạo thành công.",
