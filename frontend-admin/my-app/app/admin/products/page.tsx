@@ -4,9 +4,17 @@ import { Plus, Search } from 'lucide-react'
 import ProductGrid from "@/components/admin/ProductGrid"
 import AdminSidebar from "@/components/admin/AdminSidebar"
 import { getProducts } from "@/lib/products"
+import Link from "next/link"
+import { Pagination } from "@/components/ui/pagination"
 
-export default async function ProductsPage() {
-  const products = await getProducts()
+interface ProductsPageProps {
+  searchParams: { page?: string }
+}
+
+export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+  const currentPage = Number(searchParams.page) || 1
+  const limit = 9
+  const { products, total } = await getProducts(currentPage, limit)
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -24,12 +32,20 @@ export default async function ProductsPage() {
                 />
               </div>
             </div>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add New Product
+            <Button asChild>
+              <Link href="/admin/products/new">
+                <Plus className="h-4 w-4 mr-2" />
+                Add New Product
+              </Link>
             </Button>
           </div>
           <ProductGrid products={products} />
+          <div className="mt-8 flex justify-center">
+            <Pagination 
+              currentPage={currentPage} 
+              totalPages={Math.ceil(total / limit)}
+            />
+          </div>
         </div>
       </div>
     </div>

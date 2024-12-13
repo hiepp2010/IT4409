@@ -11,8 +11,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { getOrders } from "@/lib/orders"
+import { Pagination } from "@/components/ui/pagination"
 
-export default function OrdersPage() {
+interface OrdersPageProps {
+  searchParams: { page?: string }
+}
+
+export default async function OrdersPage({ searchParams }: OrdersPageProps) {
+  const currentPage = Number(searchParams.page) || 1
+  const limit = 10
+  const { orders, total } = await getOrders(currentPage, limit)
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       <AdminSidebar />
@@ -43,7 +53,13 @@ export default function OrdersPage() {
                 </Select>
               </div>
             </div>
-            <OrderList />
+            <OrderList orders={orders} />
+            <div className="mt-8 flex justify-center">
+              <Pagination 
+                currentPage={currentPage} 
+                totalPages={Math.ceil(total / limit)}
+              />
+            </div>
           </div>
         </div>
       </div>

@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import {
   Table,
   TableBody,
@@ -13,82 +12,15 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Order } from "@/lib/orders"
+import Link from "next/link"
 
-interface Order {
-  id: string
-  productName: string
-  date: string
-  customer: {
-    name: string
-    avatar: string
-  }
-  status: 'delivered' | 'cancelled' | 'pending'
-  amount: number
+interface OrderListProps {
+  orders: Order[]
 }
 
-const orders: Order[] = [
-  {
-    id: '425436',
-    productName: 'Classic T-Shirt',
-    date: 'Nov 05, 2023',
-    customer: {
-      name: 'Kevin Smith',
-      avatar: '/placeholder.svg'
-    },
-    status: 'delivered',
-    amount: 29.99
-  },
-  {
-    id: '425435',
-    productName: 'Leather Jacket',
-    date: 'Nov 04, 2023',
-    customer: {
-      name: 'Vincent Chase',
-      avatar: '/placeholder.svg'
-    },
-    status: 'cancelled',
-    amount: 199.99
-  },
-  {
-    id: '425434',
-    productName: 'Running Shoes',
-    date: 'Nov 03, 2023',
-    customer: {
-      name: 'Emily Johnson',
-      avatar: '/placeholder.svg'
-    },
-    status: 'pending',
-    amount: 89.99
-  },
-  {
-    id: '425433',
-    productName: 'Classic T-Shirt',
-    date: 'Nov 02, 2023',
-    customer: {
-      name: 'Michael Brown',
-      avatar: '/placeholder.svg'
-    },
-    status: 'delivered',
-    amount: 29.99
-  },
-  {
-    id: '425432',
-    productName: 'Running Shoes',
-    date: 'Nov 01, 2023',
-    customer: {
-      name: 'Sarah Davis',
-      avatar: '/placeholder.svg'
-    },
-    status: 'pending',
-    amount: 89.99
-  }
-]
-
-const ITEMS_PER_PAGE = 10
-
-export default function OrderList() {
+export default function OrderList({ orders }: OrderListProps) {
   const [selectedOrders, setSelectedOrders] = useState<string[]>([])
-  const [currentPage, setCurrentPage] = useState(1)
 
   const toggleOrder = (orderId: string) => {
     setSelectedOrders(prev => 
@@ -100,15 +32,9 @@ export default function OrderList() {
 
   const toggleAll = () => {
     setSelectedOrders(prev => 
-      prev.length === paginatedOrders.length ? [] : paginatedOrders.map(order => order.id)
+      prev.length === orders.length ? [] : orders.map(order => order.id)
     )
   }
-
-  const totalPages = Math.ceil(orders.length / ITEMS_PER_PAGE)
-  const paginatedOrders = orders.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  )
 
   return (
     <div className="bg-white rounded-lg border">
@@ -117,11 +43,10 @@ export default function OrderList() {
           <TableRow>
             <TableHead className="w-12">
               <Checkbox 
-                checked={selectedOrders.length === paginatedOrders.length}
+                checked={selectedOrders.length === orders.length}
                 onCheckedChange={toggleAll}
               />
             </TableHead>
-            <TableHead>Product</TableHead>
             <TableHead>Order ID</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Customer Name</TableHead>
@@ -130,68 +55,57 @@ export default function OrderList() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {paginatedOrders.map((order) => (
-            <TableRow key={order.id}>
-              <TableCell>
+          {orders.map((order) => (
+            <TableRow key={order.id} className="cursor-pointer hover:bg-gray-50">
+              <TableCell className="w-12" onClick={(e) => e.stopPropagation()}>
                 <Checkbox 
                   checked={selectedOrders.includes(order.id)}
                   onCheckedChange={() => toggleOrder(order.id)}
                 />
               </TableCell>
-              <TableCell>{order.productName}</TableCell>
-              <TableCell>#{order.id}</TableCell>
-              <TableCell>{order.date}</TableCell>
               <TableCell>
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-6 w-6">
-                    <AvatarImage src={order.customer.avatar} />
-                    <AvatarFallback>{order.customer.name[0]}</AvatarFallback>
-                  </Avatar>
-                  {order.customer.name}
-                </div>
+                <Link href={`/admin/orders/${order.id}`} className="block w-full h-full">
+                  #{order.id}
+                </Link>
               </TableCell>
               <TableCell>
-                <Badge 
-                  variant={
-                    order.status === 'delivered' ? 'success' : 
-                    order.status === 'cancelled' ? 'destructive' : 
-                    'default'
-                  }
-                >
-                  {order.status}
-                </Badge>
+                <Link href={`/admin/orders/${order.id}`} className="block w-full h-full">
+                  {new Date(order.date).toLocaleDateString()}
+                </Link>
               </TableCell>
-              <TableCell className="text-right">${order.amount.toFixed(2)}</TableCell>
+              <TableCell>
+                <Link href={`/admin/orders/${order.id}`} className="block w-full h-full">
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={order.customer.avatar} />
+                      <AvatarFallback>{order.customer.name[0]}</AvatarFallback>
+                    </Avatar>
+                    {order.customer.name}
+                  </div>
+                </Link>
+              </TableCell>
+              <TableCell>
+                <Link href={`/admin/orders/${order.id}`} className="block w-full h-full">
+                  <Badge 
+                    variant={
+                      order.status === 'delivered' ? 'success' : 
+                      order.status === 'cancelled' ? 'destructive' : 
+                      'default'
+                    }
+                  >
+                    {order.status}
+                  </Badge>
+                </Link>
+              </TableCell>
+              <TableCell className="text-right">
+                <Link href={`/admin/orders/${order.id}`} className="block w-full h-full">
+                  ${order.total.toFixed(2)}
+                </Link>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      <div className="flex items-center justify-between px-4 py-4 border-t">
-        <div className="flex items-center gap-2">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <Button
-              key={page}
-              variant={currentPage === page ? "default" : "outline"}
-              size="sm"
-              onClick={() => setCurrentPage(page)}
-            >
-              {page}
-            </Button>
-          ))}
-          {currentPage < totalPages && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            >
-              Next
-            </Button>
-          )}
-        </div>
-        <div className="text-sm text-gray-500">
-          Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, orders.length)} of {orders.length} entries
-        </div>
-      </div>
     </div>
   )
 }

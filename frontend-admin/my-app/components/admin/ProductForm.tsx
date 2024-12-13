@@ -20,26 +20,27 @@ import { Product, Color, Size } from "@/lib/products"
 
 interface ProductFormProps {
   initialData?: Product | null
+  isNewProduct: boolean
 }
 
 const CATEGORIES = ["Sneaker", "T-Shirt", "Jeans", "Jacket", "Accessories"]
 
-export default function ProductForm({ initialData }: ProductFormProps) {
+const emptyProduct: Product = {
+  id: "",
+  name: "",
+  description: "",
+  category: "",
+  brand: "",
+  sku: "",
+  regularPrice: 0,
+  salePrice: 0,
+  tags: [],
+  colors: [],
+}
+
+export default function ProductForm({ initialData, isNewProduct }: ProductFormProps) {
   const router = useRouter()
-  const [formData, setFormData] = useState<Product>(
-    initialData || {
-      id: "",
-      name: "",
-      description: "",
-      category: "",
-      brand: "",
-      sku: "",
-      regularPrice: 0,
-      salePrice: 0,
-      tags: [],
-      colors: [],
-    }
-  )
+  const [formData, setFormData] = useState<Product>(initialData || emptyProduct)
   const [newTag, setNewTag] = useState("")
   const [newColorName, setNewColorName] = useState("")
   const [newSizeName, setNewSizeName] = useState("")
@@ -171,6 +172,12 @@ export default function ProductForm({ initialData }: ProductFormProps) {
     router.push('/admin/products')
   }
 
+  const handleDelete = () => {
+    // In a real app, you would call an API to delete the product
+    console.log("Delete product:", formData.id)
+    router.push('/admin/products')
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       <Card className="p-6">
@@ -183,7 +190,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                placeholder="Lorem ipsum"
+                placeholder="Enter product name"
               />
             </div>
 
@@ -194,7 +201,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                placeholder="Lorem ipsum is a Dummy Text"
+                placeholder="Enter product description"
                 className="min-h-[100px]"
               />
             </div>
@@ -227,21 +234,19 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                 name="brand"
                 value={formData.brand}
                 onChange={handleInputChange}
-                placeholder="Adidas"
+                placeholder="Enter brand name"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="sku">SKU</Label>
-                <Input
-                  id="sku"
-                  name="sku"
-                  value={formData.sku}
-                  onChange={handleInputChange}
-                  placeholder="#32A53"
-                />
-              </div>
+            <div>
+              <Label htmlFor="sku">SKU</Label>
+              <Input
+                id="sku"
+                name="sku"
+                value={formData.sku}
+                onChange={handleInputChange}
+                placeholder="Enter SKU"
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -253,7 +258,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                   type="number"
                   value={formData.regularPrice}
                   onChange={handleInputChange}
-                  placeholder="₹110.40"
+                  placeholder="Enter regular price"
                 />
               </div>
               <div>
@@ -264,7 +269,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                   type="number"
                   value={formData.salePrice}
                   onChange={handleInputChange}
-                  placeholder="₹450"
+                  placeholder="Enter sale price"
                 />
               </div>
             </div>
@@ -406,22 +411,24 @@ export default function ProductForm({ initialData }: ProductFormProps) {
       </Card>
 
       <div className="flex justify-end gap-4">
-        <Button type="submit" className="w-24">
-          {initialData ? "Update" : "Create"}
-        </Button>
-        {initialData && (
-          <Button
-            type="button"
-            variant="destructive"
-            className="w-24"
-            onClick={() => {
-              // In a real app, you would call an API to delete the product
-              console.log("Delete product:", initialData.id)
-              router.push('/admin/products')
-            }}
-          >
-            Delete
+        {isNewProduct ? (
+          <Button type="submit" className="w-24">
+            Add
           </Button>
+        ) : (
+          <>
+            <Button type="submit" className="w-24">
+              Edit
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              className="w-24"
+              onClick={handleDelete}
+            >
+              Delete
+            </Button>
+          </>
         )}
         <Button
           type="button"
