@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Product, Color, Size } from '@/lib/product'
+import { Product, Color } from '@/lib/product'
 import { useCart } from '../contexts/CartContext'
 import { Button } from "@/components/ui/button"
 import { 

@@ -1,11 +1,11 @@
 'use client'
 
+import {use} from 'react'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ChevronLeft, ChevronRight, Star, Truck, ArrowLeftRight, Shield } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Truck, ArrowLeftRight, Shield } from 'lucide-react'
 import { Button } from "@/components/ui/button"
-import NavBar from '@/app/component/navbar'
 import Footer from '@/app/footer'
 import {
   Accordion,
@@ -13,6 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+
 import { getProductById, Product, Color, Size } from '@/lib/product'
 import { useCart } from '@/app/contexts/CartContext'
 import { 
@@ -24,24 +25,30 @@ import {
 } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 
-export default function ProductPage({ params }: { params: { id: string } }) {
+type ProductPageProps = Promise<{
+  id:string
+}>
+
+export default  function ProductPage(props: { params: ProductPageProps }) {
   const [product, setProduct] = useState<Product | null>(null)
   const [selectedColor, setSelectedColor] = useState<Color | null>(null)
   const [selectedSize, setSelectedSize] = useState<Size | null>(null)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const { addItem } = useCart()
   const {toast} = useToast()
+  const params = use(props.params)
+  const id = params.id
 
   useEffect(() => {
     async function fetchProduct() {
-      const fetchedProduct = await getProductById(params.id)
+      const fetchedProduct = await getProductById(id)
       if (fetchedProduct) {
         setProduct(fetchedProduct)
         setSelectedColor(fetchedProduct.color[0])
       }
     }
     fetchProduct()
-  }, [params.id])
+  }, [id])
 
   useEffect(() => {
     if (selectedColor) {
@@ -80,9 +87,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="sticky top-0 z-50 bg-white shadow-md">
-        <NavBar />
-      </header>
+
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-8">
           <nav className="text-sm mb-8">
