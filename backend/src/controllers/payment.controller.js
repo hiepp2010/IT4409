@@ -43,4 +43,19 @@ const initiatePayment = async (req, res) => {
   }
 };
 
-module.exports = { initiatePayment };
+const getDeliveryFee = async (req, res) => {
+  try {
+    const { longtitude, latitude } = req.body;
+    const deliveryFee = await PaymentService.getDeliveryFee(
+      longtitude,
+      latitude
+    );
+    res.status(200).json({
+      deliveryFee,
+    });
+  } catch (err) {
+    res.status(500).json({ err: err });
+  }
+};
+
+module.exports = { initiatePayment, getDeliveryFee };
