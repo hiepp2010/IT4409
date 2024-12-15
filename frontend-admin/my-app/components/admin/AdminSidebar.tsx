@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Package, ShoppingCart, LogOut } from 'lucide-react'
+import { LayoutDashboard, Package, ShoppingCart, Users, LogOut, FolderTree } from 'lucide-react'
 import Image from "next/image"
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
@@ -12,6 +12,8 @@ const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'All Products', href: '/admin/products', icon: Package },
   { name: 'Orders List', href: '/admin/orders', icon: ShoppingCart },
+  { name: 'Customers', href: '/admin/customers', icon: Users },
+  { name: 'Categories', href: '/admin/categories', icon: FolderTree },
 ]
 
 export default function AdminSidebar() {
