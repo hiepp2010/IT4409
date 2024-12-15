@@ -12,9 +12,9 @@ interface OrderDetailsPageProps {
 export default async function OrderDetailsPage({ params }: OrderDetailsPageProps) {
   const order = await getOrderById(params.id)
 
-//   if (!order) {
-//     notFound()
-//   }
+  // if (!order) {
+  //   notFound()
+  // }
 
   return (
     <div className="flex min-h-screen bg-gray-100">

@@ -14,6 +14,7 @@ export interface Product {
   name: string;
   description: string;
   category: string;
+  subcategory: string;
   brand: string;
   sku: string;
   regularPrice: number;
@@ -32,11 +33,12 @@ const generateRandomColor = (): Color => {
   };
 };
 
-export const products: Product[] = Array.from({ length: 20 }, (_, i) => ({
+export const products: Product[] = Array.from({ length: 50 }, (_, i) => ({
   id: `PRD${String(i + 1).padStart(5, '0')}`,
   name: `Product ${i + 1}`,
   description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
   category: ['Electronics', 'Clothing', 'Books', 'Home & Garden', 'Sports'][Math.floor(Math.random() * 5)],
+  subcategory: ['Subcategory A', 'Subcategory B', 'Subcategory C'][Math.floor(Math.random() * 3)],
   brand: ['Nike', 'Adidas', 'Apple', 'Samsung', 'Sony'][Math.floor(Math.random() * 5)],
   sku: `SKU${String(i + 1).padStart(5, '0')}`,
   regularPrice: Math.floor(Math.random() * 900) + 100,
@@ -45,25 +47,32 @@ export const products: Product[] = Array.from({ length: 20 }, (_, i) => ({
   colors: Array.from({ length: Math.floor(Math.random() * 3) + 1 }, generateRandomColor),
 }));
 
-export async function getProducts(page: number = 1, limit: number = 9): Promise<{ products: Product[], total: number }> {
-  // In a real application, this would be an API call with pagination
+export async function getProducts(page: number = 1, limit: number = 9, subcategory?: string, sku?: string): Promise<{ products: Product[], total: number }> {
+  let filteredProducts = products;
+
+  if (subcategory) {
+    filteredProducts = filteredProducts.filter(p => p.subcategory === subcategory);
+  }
+
+  if (sku) {
+    filteredProducts = filteredProducts.filter(p => p.sku.toLowerCase().includes(sku.toLowerCase()));
+  }
+
   const start = (page - 1) * limit;
   const end = start + limit;
-  const paginatedProducts = products.slice(start, end);
+  const paginatedProducts = filteredProducts.slice(start, end);
   return {
     products: paginatedProducts,
-    total: products.length
+    total: filteredProducts.length
   };
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
-  // In a real application, this would be an API call
   const product = products.find(p => p.id === id);
   return product || null;
 }
 
 export async function createProduct(product: Omit<Product, 'id'>): Promise<Product> {
-  // In a real application, this would be an API call to create a new product
   const newProduct: Product = {
     ...product,
     id: `PRD${String(products.length + 1).padStart(5, '0')}`,
@@ -73,7 +82,6 @@ export async function createProduct(product: Omit<Product, 'id'>): Promise<Produ
 }
 
 export async function updateProduct(product: Product): Promise<Product> {
-  // In a real application, this would be an API call to update an existing product
   const index = products.findIndex(p => p.id === product.id);
   if (index !== -1) {
     products[index] = product;
@@ -83,7 +91,6 @@ export async function updateProduct(product: Product): Promise<Product> {
 }
 
 export async function deleteProduct(id: string): Promise<void> {
-  // In a real application, this would be an API call to delete a product
   const index = products.findIndex(p => p.id === id);
   if (index !== -1) {
     products.splice(index, 1);
