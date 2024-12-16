@@ -10,34 +10,36 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
-import { Pagination } from "../ui/pagination"
+import { Pagination } from "@/components/ui/pagination"
 
 interface CustomerListProps {
   customers: Customer[]
   total: number
   currentPage: number
+  phoneSearch: string
 }
 
-export function CustomerList({ customers, total, currentPage }: CustomerListProps) {
+export function CustomerList({ customers, total, currentPage, phoneSearch }: CustomerListProps) {
   const router = useRouter()
-  const [phoneSearch, setPhoneSearch] = useState("")
+  const [phoneSearchInput, setPhoneSearchInput] = useState(phoneSearch)
 
-  const handleSearch = () => {
-    router.push(`?page=1&phone=${phoneSearch}`)
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    router.push(`/admin/customers?page=1&phone=${phoneSearchInput}`)
   }
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Customers</h2>
-        <div className="flex items-center gap-2">
+        <form onSubmit={handleSearch} className="flex items-center gap-2">
           <Input
             placeholder="Search by phone number"
-            value={phoneSearch}
-            onChange={(e) => setPhoneSearch(e.target.value)}
+            value={phoneSearchInput}
+            onChange={(e) => setPhoneSearchInput(e.target.value)}
           />
-          <Button onClick={handleSearch}>Search</Button>
-        </div>
+          <Button type="submit">Search</Button>
+        </form>
       </div>
 
       <div className="bg-white rounded-lg border">
@@ -109,6 +111,7 @@ export function CustomerList({ customers, total, currentPage }: CustomerListProp
         <Pagination
           currentPage={currentPage}
           totalPages={Math.ceil(total / 10)}
+          searchParams={{ phone: phoneSearch }}
         />
       </div>
     </div>

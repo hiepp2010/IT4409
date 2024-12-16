@@ -16,7 +16,12 @@ export default async function CustomersPage({ searchParams }: CustomersPageProps
       <AdminSidebar />
       <div className="flex-1">
         <div className="p-8">
-          <CustomerList customers={customers} total={total} currentPage={currentPage} />
+          <CustomerList 
+            customers={customers} 
+            total={total} 
+            currentPage={currentPage} 
+            phoneSearch={searchParams.phone || ""}
+          />
         </div>
       </div>
     </div>

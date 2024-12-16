@@ -20,9 +20,10 @@ interface ProductGridProps {
 
 export default function ProductGrid({ products }: ProductGridProps) {
   const getTotalStock = (product: Product) => 
-    product.colors.reduce((total, color) => 
-      total + color.sizes.reduce((colorTotal, size) => colorTotal + size.quantity, 0)
-    , 0)
+    product.colors?.reduce((total, color) => 
+      total + (color.sizes?.reduce((colorTotal, size) => 
+        colorTotal + (size.quantity || 0), 0) || 0)
+    , 0) || 0
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -35,16 +36,25 @@ export default function ProductGrid({ products }: ProductGridProps) {
                 <div className="flex gap-4">
                   <div className="w-16 h-16 relative">
                     <Image
-                      src={product.colors[0]?.images[0] || '/placeholder.svg'}
+                      src={product.colors[0]?.imagePaths[0] || '/placeholder.svg'}
                       alt={product.name}
                       fill
                       className="object-cover rounded"
                     />
                   </div>
                   <div>
+                    <p className="text-sm font-medium mt-1"> 
+                      {
+                        product.colors[0]?.imagePaths[0]
+                      }
+                    </p>
                     <h3 className="font-medium">{product.name}</h3>
-                    <p className="text-sm text-gray-500">{product.category}</p>
-                    <p className="text-sm font-medium mt-1">₹{product.regularPrice.toFixed(2)}</p>
+                    <p className="text-sm text-gray-500">{product.subcategoryId}</p>
+                    <p className="text-sm font-medium mt-1">
+                      {typeof product.price === 'number' 
+                        ? `₹${product.price.toFixed(2)}` 
+                        : 'Price not available'}
+                    </p>
                   </div>
                 </div>
                 <DropdownMenu>
@@ -65,9 +75,13 @@ export default function ProductGrid({ products }: ProductGridProps) {
               </div>
 
               <div className="mt-6">
+               <p className="text-sm text-gray-500 mb-6">
+                    {product.colors[0]?.imagePaths[0]}
+                </p>
                 <h4 className="text-sm font-medium mb-4">Summary</h4>
                 <p className="text-sm text-gray-500 mb-6">
-                  {product.colors.length} color(s), {product.colors.reduce((total, color) => total + color.sizes.length, 0)} size(s)
+                  {product.colors?.length || 0} color(s), 
+                  {product.colors?.reduce((total, color) => total + (color.sizes?.length || 0), 0) || 0} size(s)
                 </p>
                 
                 <div className="space-y-4">

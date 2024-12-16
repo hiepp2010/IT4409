@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Trash2, Plus, X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
@@ -16,34 +16,72 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Product, Color, Size } from "@/lib/products"
+import { Product, Color, Size, createProduct, updateProduct, deleteProduct } from "@/lib/products"
+import { SubCategory, getCategories } from "@/lib/categories"
+import { toast } from "@/hooks/use-toast"
 
 interface ProductFormProps {
-  initialData?: Product | null
+  initialData: Product | null
   isNewProduct: boolean
 }
-
-const CATEGORIES = ["Sneaker", "T-Shirt", "Jeans", "Jacket", "Accessories"]
 
 const emptyProduct: Product = {
   id: "",
   name: "",
   description: "",
-  category: "",
+  subcategoryId: "",
   brand: "",
   sku: "",
-  regularPrice: 0,
-  salePrice: 0,
-  tags: [],
+  price: 0,
+  discountedPrice: 0,
   colors: [],
 }
 
 export default function ProductForm({ initialData, isNewProduct }: ProductFormProps) {
   const router = useRouter()
   const [formData, setFormData] = useState<Product>(initialData || emptyProduct)
-  const [newTag, setNewTag] = useState("")
   const [newColorName, setNewColorName] = useState("")
   const [newSizeName, setNewSizeName] = useState("")
+  const [newImageUrl, setNewImageUrl] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [subcategories, setSubcategories] = useState<SubCategory[]>([])
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>("")
+
+  useEffect(() => {
+    console.log("Updated formData:", formData);
+  }, [formData]);
+
+  useEffect(() => {
+    fetchSubcategories()
+  }, [])
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        ...initialData,
+        colors: initialData.colors || []
+      })
+      setSelectedSubcategory(initialData.subcategoryId)
+    }
+  }, [initialData])
+
+  const fetchSubcategories = async () => {
+    try {
+      const response = await fetch('http://localhost:3002/subcategories');
+      if (!response.ok) {
+        throw new Error('Failed to fetch subcategories');
+      }
+      const fetchedSubcategories = await response.json();
+      setSubcategories(fetchedSubcategories);
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch subcategories",
+        variant: "destructive",
+      })
+    }
+  }
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -52,34 +90,26 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleAddTag = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && newTag.trim()) {
-      e.preventDefault()
-      setFormData((prev) => ({
-        ...prev,
-        tags: [...prev.tags, newTag.trim()]
-      }))
-      setNewTag("")
-    }
-  }
-
-  const removeTag = (tagToRemove: string) => {
-    setFormData((prev) => ({
+  const handleSubcategoryChange = (value: string) => {
+    setFormData(prev => ({
       ...prev,
-      tags: prev.tags.filter((tag) => tag !== tagToRemove)
-    }))
-  }
+      subcategoryId: value,
+    }));
+    setSelectedSubcategory(value);
+  };
+
 
   const handleAddColor = () => {
     if (newColorName.trim()) {
       const newColor: Color = {
         name: newColorName.trim(),
         sizes: [],
-        images: []
+        images: [],
+        imagePaths: []
       }
       setFormData((prev) => ({
         ...prev,
-        colors: [...prev.colors, newColor]
+        colors: [...(prev.colors || []), newColor]
       }))
       setNewColorName("")
     }
@@ -89,11 +119,11 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
     if (newSizeName.trim()) {
       setFormData((prev) => ({
         ...prev,
-        colors: prev.colors.map((color, index) => {
+        colors: (prev.colors || []).map((color, index) => {
           if (index === colorIndex) {
             return {
               ...color,
-              sizes: [...color.sizes, { name: newSizeName.trim(), quantity: 0 }]
+              sizes: [...(color.sizes || []), { name: newSizeName.trim(), quantity: 0 }]
             }
           }
           return color
@@ -110,11 +140,11 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
   ) => {
     setFormData((prev) => ({
       ...prev,
-      colors: prev.colors.map((color, cIndex) => {
+      colors: (prev.colors || []).map((color, cIndex) => {
         if (cIndex === colorIndex) {
           return {
             ...color,
-            sizes: color.sizes.map((size, sIndex) =>
+            sizes: (color.sizes || []).map((size, sIndex) =>
               sIndex === sizeIndex ? { ...size, quantity } : size
             )
           }
@@ -127,37 +157,36 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
   const removeColor = (colorIndex: number) => {
     setFormData((prev) => ({
       ...prev,
-      colors: prev.colors.filter((_, index) => index !== colorIndex)
+      colors: (prev.colors || []).filter((_, index) => index !== colorIndex)
     }))
   }
 
-  const handleImageUpload = (colorIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || [])
-    // In a real app, you would upload these files to a storage service
-    // For now, we'll just create URLs for preview
-    const newImages = files.map((file) => URL.createObjectURL(file))
-    setFormData((prev) => ({
-      ...prev,
-      colors: prev.colors.map((color, index) => {
-        if (index === colorIndex) {
-          return {
-            ...color,
-            images: [...color.images, ...newImages]
+  const handleAddImage = (colorIndex: number) => {
+    if (newImageUrl.trim()) {
+      setFormData((prev) => ({
+        ...prev,
+        colors: (prev.colors || []).map((color, index) => {
+          if (index === colorIndex) {
+            return {
+              ...color,
+              imagePaths: [...(color.imagePaths || []), newImageUrl.trim()]
+            }
           }
-        }
-        return color
-      })
-    }))
+          return color
+        })
+      }))
+      setNewImageUrl("")
+    }
   }
 
-  const removeImage = (colorIndex: number, imageUrl: string) => {
+  const removeImage = (colorIndex: number, imageToRemove: string) => {
     setFormData((prev) => ({
       ...prev,
-      colors: prev.colors.map((color, index) => {
+      colors: (prev.colors || []).map((color, index) => {
         if (index === colorIndex) {
           return {
             ...color,
-            images: color.images.filter((img) => img !== imageUrl)
+            imagePaths: (color.imagePaths || []).filter((img) => img !== imageToRemove)
           }
         }
         return color
@@ -167,15 +196,83 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // In a real app, you would send this to your API
-    console.log(formData)
-    router.push('/admin/products')
+    setIsLoading(true)
+
+    try {
+      let savedProduct: Product
+      if (isNewProduct) {
+        const response = await fetch('http://localhost:3002/products', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        })
+        if (!response.ok) {
+          throw new Error('Failed to create product')
+        }
+        savedProduct = await response.json()
+        toast({
+          title: "Success",
+          description: "Product created successfully",
+        })
+      } else {
+        const response = await fetch(`http://localhost:3002/products/${formData.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        })
+        if (!response.ok) {
+          throw new Error('Failed to update product')
+        }
+        savedProduct = await response.json()
+        toast({
+          title: "Success",
+          description: "Product updated successfully",
+        })
+      }
+      router.push('/admin/products')
+    } catch (error) {
+      console.error("Error:", error)
+      toast({
+        title: "Error",
+        description: isNewProduct ? "Failed to create product" : "Failed to update product",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleDelete = () => {
-    // In a real app, you would call an API to delete the product
-    console.log("Delete product:", formData.id)
-    router.push('/admin/products')
+
+  const handleDelete = async () => {
+    if (confirm('Are you sure you want to delete this product?')) {
+      setIsLoading(true)
+      try {
+        const response = await fetch(`http://localhost:3002/products/${formData.id}`, {
+          method: 'DELETE',
+        })
+        if (!response.ok) {
+          throw new Error('Failed to delete product')
+        }
+        toast({
+          title: "Success",
+          description: "Product deleted successfully",
+        })
+        router.push('/admin/products')
+      } catch (error) {
+        console.error("Error:", error)
+        toast({
+          title: "Error",
+          description: "Failed to delete product",
+          variant: "destructive",
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
   }
 
   return (
@@ -207,27 +304,6 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
             </div>
 
             <div>
-              <Label htmlFor="category">Category</Label>
-              <Select
-                value={formData.category}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({ ...prev, category: value }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
               <Label htmlFor="brand">Brand Name</Label>
               <Input
                 id="brand"
@@ -236,6 +312,25 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
                 onChange={handleInputChange}
                 placeholder="Enter brand name"
               />
+            </div>
+
+            <div>
+              <Label htmlFor="subcategory">Subcategory</Label>
+              <Select
+                value={formData.subcategoryId}
+                onValueChange={handleSubcategoryChange}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select subcategory" />
+                </SelectTrigger>
+                <SelectContent>
+                  {subcategories.map((subCategory) => (
+                    <SelectItem key={subCategory.id} value={subCategory.id}>
+                      {subCategory.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
@@ -251,51 +346,27 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="regularPrice">Regular Price</Label>
+                <Label htmlFor="price">Price</Label>
                 <Input
-                  id="regularPrice"
-                  name="regularPrice"
+                  id="price"
+                  name="price"
                   type="number"
-                  value={formData.regularPrice}
+                  value={formData.price}
                   onChange={handleInputChange}
-                  placeholder="Enter regular price"
+                  placeholder="Enter price"
                 />
               </div>
               <div>
-                <Label htmlFor="salePrice">Sale Price</Label>
+                <Label htmlFor="discountedPrice">Discounted Price</Label>
                 <Input
-                  id="salePrice"
-                  name="salePrice"
+                  id="discountedPrice"
+                  name="discountedPrice"
                   type="number"
-                  value={formData.salePrice}
+                  value={formData.discountedPrice}
                   onChange={handleInputChange}
-                  placeholder="Enter sale price"
+                  placeholder="Enter discounted price"
                 />
               </div>
-            </div>
-
-            <div>
-              <Label>Tags</Label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {formData.tags.map((tag) => (
-                  <Badge key={tag} variant="secondary" className="gap-1">
-                    {tag}
-                    <button
-                      type="button"
-                      onClick={() => removeTag(tag)}
-                      className="text-xs"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                ))}
-              </div>
-              <Input
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                onKeyDown={handleAddTag}
-                placeholder="Type and press Enter to add tags"
-              />
             </div>
           </div>
 
@@ -314,7 +385,7 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
               </div>
 
               <div className="space-y-4 mt-4">
-                {formData.colors.map((color, colorIndex) => (
+                {(formData.colors || []).map((color, colorIndex) => (
                   <Card key={colorIndex} className="p-4">
                     <div className="flex justify-between items-center mb-4">
                       <h4 className="font-medium">{color.name}</h4>
@@ -338,7 +409,7 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
                         </Button>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
-                        {color.sizes.map((size, sizeIndex) => (
+                        {(color.sizes || []).map((size, sizeIndex) => (
                           <div
                             key={sizeIndex}
                             className="flex items-center gap-2"
@@ -363,29 +434,20 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
                     </div>
                     <div className="mt-4">
                       <Label>Color Images</Label>
-                      <div className="mt-2 border-2 border-dashed rounded-lg p-6 text-center">
-                        <input
-                          type="file"
-                          multiple
-                          accept="image/*"
-                          onChange={(e) => handleImageUpload(colorIndex, e)}
-                          className="hidden"
-                          id={`image-upload-${colorIndex}`}
+                      <div className="flex gap-2 mt-2">
+                        <Input
+                          type="url"
+                          value={newImageUrl}
+                          onChange={(e) => setNewImageUrl(e.target.value)}
+                          placeholder="Enter Google Drive image URL"
                         />
-                        <label
-                          htmlFor={`image-upload-${colorIndex}`}
-                          className="cursor-pointer text-blue-600 hover:text-blue-700"
-                        >
-                          Drop your images here, or browse
-                        </label>
-                        <p className="text-sm text-gray-500 mt-1">
-                          jpeg, png are allowed
-                        </p>
+                        <Button type="button" onClick={() => handleAddImage(colorIndex)}>
+                          <Plus className="h-4 w-4" />
+                        </Button>
                       </div>
                       <div className="grid grid-cols-2 gap-4 mt-4">
-                        {color.images.map((image, imageIndex) => (
+                        {(color.imagePaths || []).map((image, imageIndex) => (
                           <div key={imageIndex} className="relative">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={image}
                               alt={`Color ${color.name} - Image ${imageIndex + 1}`}
@@ -412,21 +474,22 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
 
       <div className="flex justify-end gap-4">
         {isNewProduct ? (
-          <Button type="submit" className="w-24">
-            Add
+          <Button type="submit" className="w-24" disabled={isLoading}>
+            {isLoading ? 'Adding...' : 'Add'}
           </Button>
         ) : (
           <>
-            <Button type="submit" className="w-24">
-              Edit
+            <Button type="submit" className="w-24" disabled={isLoading}>
+              {isLoading ? 'Saving...' : 'Save'}
             </Button>
             <Button
               type="button"
               variant="destructive"
               className="w-24"
               onClick={handleDelete}
+              disabled={isLoading}
             >
-              Delete
+              {isLoading ? 'Deleting...' : 'Delete'}
             </Button>
           </>
         )}
@@ -435,6 +498,7 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
           variant="outline"
           className="w-24"
           onClick={() => router.push('/admin/products')}
+          disabled={isLoading}
         >
           Cancel
         </Button>
