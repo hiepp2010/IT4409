@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from "react"
-import { Category } from "@/lib/categories"
+import { Category, createCategory, updateCategory } from "@/lib/categories"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useRouter } from "next/navigation"
-import { createCategory, updateCategory } from "@/lib/categories"
+import { toast } from "@/hooks/use-toast"
 
 interface CategoryDialogProps {
   category: Category | null
@@ -42,17 +42,30 @@ export function CategoryDialog({
     try {
       if (isCreating) {
         await createCategory({ name });
-        if (onCategoryCreated) {
-          onCategoryCreated();
-        }
+        toast({
+          title: "Success",
+          description: "Category created successfully",
+        })
       } else if (category) {
         await updateCategory(category.id, { name });
+        toast({
+          title: "Success",
+          description: "Category updated successfully",
+        })
       }
 
       router.refresh()
+      if (onCategoryCreated) {
+        onCategoryCreated();
+      }
       onOpenChange(false)
     } catch (error) {
       console.error("Error:", error)
+      toast({
+        title: "Error",
+        description: isCreating ? "Failed to create category" : "Failed to update category",
+        variant: "destructive",
+      })
     } finally {
       setIsLoading(false)
     }

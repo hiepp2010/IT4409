@@ -6,96 +6,132 @@ export interface Size {
 export interface Color {
   name: string;
   sizes: Size[];
-  images: string[];
+  imagePaths: string[];
 }
 
 export interface Product {
   id: string;
   name: string;
   description: string;
-  category: string;
-  subcategory: string;
+  categoryId: string;
+  subcategoryId: string;
   brand: string;
   sku: string;
-  regularPrice: number;
-  salePrice: number;
+  price: number;
+  discountedPrice: number;
   tags: string[];
   colors: Color[];
 }
 
-const generateRandomColor = (): Color => {
-  const colorNames = ['Red', 'Blue', 'Green', 'Yellow', 'Black', 'White'];
-  const sizes = ['XS', 'S', 'M', 'L', 'XL'];
-  return {
-    name: colorNames[Math.floor(Math.random() * colorNames.length)],
-    sizes: sizes.map(size => ({ name: size, quantity: Math.floor(Math.random() * 50) + 10 })),
-    images: ['/placeholder.svg']
-  };
-};
+const API_URL = 'http://localhost:3002';
 
-export const products: Product[] = Array.from({ length: 50 }, (_, i) => ({
-  id: `PRD${String(i + 1).padStart(5, '0')}`,
-  name: `Product ${i + 1}`,
-  description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-  category: ['Electronics', 'Clothing', 'Books', 'Home & Garden', 'Sports'][Math.floor(Math.random() * 5)],
-  subcategory: ['Subcategory A', 'Subcategory B', 'Subcategory C'][Math.floor(Math.random() * 3)],
-  brand: ['Nike', 'Adidas', 'Apple', 'Samsung', 'Sony'][Math.floor(Math.random() * 5)],
-  sku: `SKU${String(i + 1).padStart(5, '0')}`,
-  regularPrice: Math.floor(Math.random() * 900) + 100,
-  salePrice: Math.floor(Math.random() * 800) + 50,
-  tags: ['tag1', 'tag2', 'tag3'].slice(0, Math.floor(Math.random() * 3) + 1),
-  colors: Array.from({ length: Math.floor(Math.random() * 3) + 1 }, generateRandomColor),
-}));
-
-export async function getProducts(page: number = 1, limit: number = 9, subcategory?: string, sku?: string): Promise<{ products: Product[], total: number }> {
-  let filteredProducts = products;
-
-  if (subcategory) {
-    filteredProducts = filteredProducts.filter(p => p.subcategory === subcategory);
+export async function getProducts(page: number = 1, limit: number = 9, subcategoryId?: string, sku?: string): Promise<{ products: Product[], total: number }> {
+  let url = `${API_URL}/products?page=${page}&limit=${limit}`;
+  if (subcategoryId) {
+    url += `&subcategoryId=${subcategoryId}`;
   }
-
   if (sku) {
-    filteredProducts = filteredProducts.filter(p => p.sku.toLowerCase().includes(sku.toLowerCase()));
+    url += `&sku=${sku}`;
   }
 
-  const start = (page - 1) * limit;
-  const end = start + limit;
-  const paginatedProducts = filteredProducts.slice(start, end);
-  return {
-    products: paginatedProducts,
-    total: filteredProducts.length
-  };
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error('Failed to fetch products');
+  }
+  const data = await response.json();
+  
+  const mappedProducts: Product[] = data.products.map((item: any) => ({
+    id: item.id,
+    name: item.name,
+    description: item.description,
+    categoryId: item.categoryId,
+    subcategoryId: item.subcategoryId,
+    brand: item.brand,
+    sku: item.sku,
+    price: item.price,
+    discountedPrice: item.discountedPrice,
+    tags: item.tags,
+    colors: item.colors.map((color: any) => ({
+      name: color.name,
+      sizes: color.sizes,
+      imagePaths: color.imagePaths.map((img: any) => img.path)
+    }))
+  }));
+
+  return { products: mappedProducts, total: data.total };
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
-  const product = products.find(p => p.id === id);
-  return product || null;
+  const response = await fetch(`${API_URL}/products/${id}`);
+  if (!response.ok) {
+    if (response.status === 404) {
+      return null;
+    }
+    throw new Error('Failed to fetch product');
+  }
+  const item = await response.json();
+  
+  return {
+    id: item.id,
+    name: item.name,
+    description: item.description,
+    categoryId: item.categoryId,
+    subcategoryId: item.subcategoryId,
+    brand: item.brand,
+    sku: item.sku,
+    price: item.price,
+    discountedPrice: item.discountedPrice,
+    tags: item.tags,
+    colors: item.colors.map((color: any) => ({
+      name: color.name,
+      sizes: color.sizes,
+      imagePaths: color.imagePaths.map((img: any) => img.path)
+    }))
+  };
 }
 
 export async function createProduct(product: Omit<Product, 'id'>): Promise<Product> {
-  const newProduct: Product = {
-    ...product,
-    id: `PRD${String(products.length + 1).padStart(5, '0')}`,
-  };
-  products.push(newProduct);
-  return newProduct;
+  const response = await fetch(`${API_URL}/products`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      ...product,
+      regularPrice: product.price,
+      salePrice: product.discountedPrice,
+    }),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to create product');
+  }
+  return getProductById((await response.json()).id);
 }
 
-export async function updateProduct(product: Product): Promise<Product> {
-  const index = products.findIndex(p => p.id === product.id);
-  if (index !== -1) {
-    products[index] = product;
-    return product;
+export async function updateProduct(id: string, product: Partial<Product>): Promise<Product> {
+  const response = await fetch(`${API_URL}/products/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      ...product,
+      regularPrice: product.price,
+      salePrice: product.discountedPrice,
+    }),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to update product');
   }
-  throw new Error('Product not found');
+  return getProductById(id);
 }
 
 export async function deleteProduct(id: string): Promise<void> {
-  const index = products.findIndex(p => p.id === id);
-  if (index !== -1) {
-    products.splice(index, 1);
-  } else {
-    throw new Error('Product not found');
+  const response = await fetch(`${API_URL}/products/${id}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete product');
   }
 }
 

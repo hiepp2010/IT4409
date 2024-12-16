@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from "react"
-import { Category, getCategories } from "@/lib/categories"
+import { useState, useEffect } from "react"
+import { Category, getCategories, deleteCategory } from "@/lib/categories"
 import { Button } from "@/components/ui/button"
-import { Plus, Pencil } from 'lucide-react'
+import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { CategoryDialog } from "./CategoryDialog"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useRouter } from 'next/navigation'
+import { toast } from "@/hooks/use-toast"
 
 interface CategoryGridProps {
   initialCategories: Category[]
@@ -35,9 +36,46 @@ export function CategoryGrid({ initialCategories }: CategoryGridProps) {
     setIsDialogOpen(true)
   }
 
-  const handleCategoryCreated = async () => {
-    const updatedCategories = await getCategories()
-    setCategories(updatedCategories)
+  const fetchCategories = async () => {
+    try {
+      const updatedCategories = await getCategories()
+      setCategories(updatedCategories)
+    } catch (error) {
+      console.error("Error fetching categories:", error)
+      toast({
+        title: "Error",
+        description: "Failed to fetch categories",
+        variant: "destructive",
+      })
+    }
+  }
+
+  useEffect(() => {
+    fetchCategories()
+  }, [])
+
+  const handleCategoryCreated = () => {
+    fetchCategories()
+  }
+
+  const handleDelete = async (categoryId: string) => {
+    if (confirm('Are you sure you want to delete this category?')) {
+      try {
+        await deleteCategory(categoryId)
+        toast({
+          title: "Success",
+          description: "Category deleted successfully",
+        })
+        fetchCategories()
+      } catch (error) {
+        console.error("Error deleting category:", error)
+        toast({
+          title: "Error",
+          description: "Failed to delete category",
+          variant: "destructive",
+        })
+      }
+    }
   }
 
   return (
@@ -60,16 +98,28 @@ export function CategoryGrid({ initialCategories }: CategoryGridProps) {
               <CardTitle className="text-sm font-medium">
                 {category.name}
               </CardTitle>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleEdit(category);
-                }}
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
+              <div>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEdit(category);
+                  }}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(category.id);
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{category.totalProducts}</div>

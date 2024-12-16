@@ -8,13 +8,13 @@ import Link from "next/link"
 import { Pagination } from "@/components/ui/pagination"
 
 interface ProductsPageProps {
-  searchParams: { page?: string }
+  searchParams: { page?: string; sku?: string }
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const currentPage = Number(searchParams.page) || 1
   const limit = 9
-  const { products, total } = await getProducts(currentPage, limit)
+  const { products, total } = await getProducts(currentPage, limit, undefined, searchParams.sku)
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -24,12 +24,20 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           <div className="mb-8 flex justify-between items-center">
             <div className="flex items-center gap-4">
               <h1 className="text-2xl font-semibold">All Products</h1>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input 
-                  placeholder="Search products..." 
-                  className="pl-10 w-[300px]"
-                />
+              <div className="relative flex items-center">
+                <Search className="absolute left-3 text-gray-400 h-4 w-4" />
+                <form action="/admin/products" method="GET" className="flex items-center">
+                  <Input 
+                    name="sku"
+                    placeholder="Search by SKU..." 
+                    className="pl-10 w-[300px]"
+                    defaultValue={searchParams.sku}
+                  />
+                  <input type="hidden" name="page" value="1" />
+                  <Button type="submit" className="ml-2">
+                    Search
+                  </Button>
+                </form>
               </div>
             </div>
             <Button asChild>
@@ -44,6 +52,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             <Pagination 
               currentPage={currentPage} 
               totalPages={Math.ceil(total / limit)}
+              searchParams={searchParams}
             />
           </div>
         </div>
