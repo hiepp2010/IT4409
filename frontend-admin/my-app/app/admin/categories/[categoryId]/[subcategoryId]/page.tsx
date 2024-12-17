@@ -1,4 +1,4 @@
-import { getCategories } from "@/lib/categories"
+import { getCategoryById } from "@/lib/categories"
 import { getProducts } from "@/lib/products"
 import AdminSidebar from "@/components/admin/AdminSidebar"
 import { ProductList } from "@/components/admin/ProductList"
@@ -13,17 +13,20 @@ interface SubcategoryProductsPageProps {
 }
 
 export default async function SubcategoryProductsPage({ params, searchParams }: SubcategoryProductsPageProps) {
-  const categories = await getCategories()
-  const category = categories.find(c => c.id === params.categoryId)
-  const subcategory = category?.subCategories.find(sc => sc.id === params.subcategoryId)
+  const category = await getCategoryById(params.categoryId)
 
-  if (!category || !subcategory) {
+  if (!category) {
     notFound()
   }
+  console.log(category)
+  const subcategory = category.subCategories.find(sc => sc.id == params.subcategoryId)
+  // if (!subcategory) {
+  //   notFound()
+  // }
 
   const currentPage = Number(searchParams.page) || 1
   const limit = 10
-  const { products, total } = await getProducts(currentPage, limit, subcategory.name, searchParams.sku)
+  const { products, total } = await getProducts(currentPage, limit, params.subcategoryId, searchParams.sku)
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -35,9 +38,10 @@ export default async function SubcategoryProductsPage({ params, searchParams }: 
             products={products} 
             total={total} 
             currentPage={currentPage} 
-            subcategoryName={subcategory.name}
-            categoryId={params.categoryId}
             subcategoryId={params.subcategoryId}
+            categoryId={params.categoryId}
+            subcategoryName={subcategory.name}
+            hasProducts={products.length > 0}
           />
         </div>
       </div>

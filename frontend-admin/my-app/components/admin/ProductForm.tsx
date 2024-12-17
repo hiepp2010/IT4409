@@ -20,6 +20,15 @@ import { Product, Color, Size, createProduct, updateProduct, deleteProduct } fro
 import { SubCategory, getCategories } from "@/lib/categories"
 import { toast } from "@/hooks/use-toast"
 
+// Add this function after the imports
+function convertGoogleDriveUrl(url: string): string {
+  const fileId = url.match(/\/d\/(.+?)\/view/)?.[1]
+  if (fileId) {
+    return `https://drive.google.com/uc?export=view&id=${fileId}`
+  }
+  return url
+}
+
 interface ProductFormProps {
   initialData: Product | null
   isNewProduct: boolean
@@ -42,10 +51,10 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
   const [formData, setFormData] = useState<Product>(initialData || emptyProduct)
   const [newColorName, setNewColorName] = useState("")
   const [newSizeName, setNewSizeName] = useState("")
-  const [newImageUrl, setNewImageUrl] = useState("")
+  const [newImageUrls, setNewImageUrls] = useState<{[key: number]: string}>({})
   const [isLoading, setIsLoading] = useState(false)
   const [subcategories, setSubcategories] = useState<SubCategory[]>([])
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string>("")
+  const [subcategoryName, setSubcategoryName] = useState(""); // Added state for subcategory name
 
   useEffect(() => {
     console.log("Updated formData:", formData);
@@ -61,9 +70,13 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
         ...initialData,
         colors: initialData.colors || []
       })
-      setSelectedSubcategory(initialData.subcategoryId)
+      // Set the initial subcategory name
+      const initialSubcategory = subcategories.find(sc => sc.id === initialData.subcategoryId)
+      if (initialSubcategory) {
+        setSubcategoryName(initialSubcategory.name)
+      }
     }
-  }, [initialData])
+  }, [initialData, subcategories]) // Updated dependencies
 
   const fetchSubcategories = async () => {
     try {
@@ -91,11 +104,14 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
   }
 
   const handleSubcategoryChange = (value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      subcategoryId: value,
-    }));
-    setSelectedSubcategory(value);
+    const selectedSubcategory = subcategories.find(sc => sc.id === value)
+    if (selectedSubcategory) {
+      setSubcategoryName(selectedSubcategory.name)
+      setFormData(prev => ({
+        ...prev,
+        subcategoryId: value,
+      }));
+    }
   };
 
 
@@ -162,20 +178,22 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
   }
 
   const handleAddImage = (colorIndex: number) => {
-    if (newImageUrl.trim()) {
+    const imageUrl = newImageUrls[colorIndex]
+    if (imageUrl && imageUrl.trim()) {
+      const convertedUrl = convertGoogleDriveUrl(imageUrl.trim())
       setFormData((prev) => ({
         ...prev,
-        colors: (prev.colors || []).map((color, index) => {
+        colors: prev.colors.map((color, index) => {
           if (index === colorIndex) {
             return {
               ...color,
-              imagePaths: [...(color.imagePaths || []), newImageUrl.trim()]
+              imagePaths: [...(color.imagePaths || []), convertedUrl]
             }
           }
           return color
         })
       }))
-      setNewImageUrl("")
+      setNewImageUrls(prev => ({...prev, [colorIndex]: ''}))
     }
   }
 
@@ -321,7 +339,9 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
                 onValueChange={handleSubcategoryChange}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select subcategory" />
+                  <SelectValue>
+                    {subcategoryName || "Select subcategory"}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {subcategories.map((subCategory) => (
@@ -437,9 +457,9 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
                       <div className="flex gap-2 mt-2">
                         <Input
                           type="url"
-                          value={newImageUrl}
-                          onChange={(e) => setNewImageUrl(e.target.value)}
-                          placeholder="Enter Google Drive image URL"
+                          value={newImageUrls[colorIndex] || ''}
+                          onChange={(e) => setNewImageUrls(prev => ({...prev, [colorIndex]: e.target.value}))}
+                          placeholder="Enter image URL or Google Drive link"
                         />
                         <Button type="button" onClick={() => handleAddImage(colorIndex)}>
                           <Plus className="h-4 w-4" />
