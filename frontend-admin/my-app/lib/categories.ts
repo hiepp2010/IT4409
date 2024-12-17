@@ -14,7 +14,7 @@ export interface Category {
   totalProducts: number;
 }
 
-const API_URL = 'http://localhost:3002';
+const API_URL = 'http://localhost:3100';
 
 export async function getCategories(): Promise<Category[]> {
   const response = await fetch(`${API_URL}/categories`);

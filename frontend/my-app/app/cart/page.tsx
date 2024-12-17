@@ -1,6 +1,6 @@
 'use client'
 
-import { useCart } from "../contexts/CartContext"
+import { useCart } from '@/app/contexts/CartContext'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Image from 'next/image'
@@ -11,7 +11,8 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function CartPage() {
-  const { items, removeItem, adjustQuantity } = useCart()
+  const { items, removeItem, adjustQuantity, clearCart } = useCart()
+  console.log(items)
   const [isSticky, setIsSticky] = useState(false)
 
   const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
@@ -39,7 +40,7 @@ export default function CartPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">Giỏ Hàng Của Bạn</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">Your Shopping Cart</h1>
       
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Main Cart Section */}
@@ -53,10 +54,10 @@ export default function CartPage() {
                 className="text-center py-12 bg-gray-50 rounded-lg"
               >
                 <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-600 mb-4 text-lg">Giỏ hàng của bạn đang trống</p>
+                <p className="text-gray-600 mb-4 text-lg">Your cart is empty</p>
                 <Link href="/">
                   <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                    Tiếp Tục Mua Sắm
+                    Continue Shopping
                   </Button>
                 </Link>
               </motion.div>
@@ -68,8 +69,8 @@ export default function CartPage() {
                 className="space-y-6"
               >
                 {items.map((item) => {
-                  const color = item.product.color.find(c => c.id === item.selectedColor)
-                  const size = color?.size.find(s => s.size === item.selectedSize)
+                  const color = item.product.colors.find(c => c.name === item.selectedColor)
+                  const size = color?.sizes.find(s => s.name === item.selectedSize)
                   const maxQuantity = size?.quantity || 0
 
                   return (
@@ -82,7 +83,7 @@ export default function CartPage() {
                     >
                       <div className="w-32 h-32 relative flex-shrink-0 overflow-hidden rounded-md">
                         <Image
-                          src={color?.image[0] || '/placeholder.svg'}
+                          src={color?.imagePaths[0] || '/placeholder.svg'}
                           alt={item.product.name}
                           fill
                           className="object-cover transition-transform hover:scale-105"
@@ -92,9 +93,9 @@ export default function CartPage() {
                         <div className="flex justify-between">
                           <div>
                             <h3 className="font-semibold text-lg">{item.product.name}</h3>
-                            <p className="text-sm text-gray-500">MSP: {item.product.id}</p>
+                            <p className="text-sm text-gray-500">SKU: {item.product.sku}</p>
                             <p className="text-sm text-gray-500">
-                              Màu: {color?.color_name} | Kích thước: {item.selectedSize}
+                              Color: {item.selectedColor} | Size: {item.selectedSize}
                             </p>
                           </div>
                           <p className="font-semibold text-lg">${item.product.price.toFixed(2)}</p>
@@ -118,6 +119,7 @@ export default function CartPage() {
                               <Minus className="h-4 w-4" />
                             </Button>
                             <Input
+                              type="number"
                               value={item.quantity}
                               onChange={(e) => handleQuantityChange(
                                 item.product.id,
@@ -176,39 +178,39 @@ export default function CartPage() {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="bg-gray-50 p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Tổng Đơn Hàng</h2>
+            <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
             <div className="space-y-4">
               <div className="flex justify-between">
-                <span>Tạm tính:</span>
+                <span>Subtotal:</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span>Phí vận chuyển:</span>
-                <span>{shipping === 0 ? 'Miễn phí' : `$${shipping}`}</span>
+                <span>Shipping:</span>
+                <span>{shipping === 0 ? 'Free' : `$${shipping}`}</span>
               </div>
               <Separator />
               <div className="flex justify-between font-semibold text-lg">
-                <span>Tổng cộng:</span>
+                <span>Total:</span>
                 <span>${total.toFixed(2)}</span>
               </div>
               <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-6">
-                Thanh Toán
+                Proceed to Checkout
               </Button>
             </div>
           </div>
 
           {/* Newsletter Section */}
           <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold mb-4">Đăng Ký Nhận Thông Tin</h3>
-            <p className="text-sm text-gray-600 mb-4">Nhận thông tin ưu đãi và xu hướng mới nhất</p>
+            <h3 className="text-lg font-semibold mb-4">Subscribe to Our Newsletter</h3>
+            <p className="text-sm text-gray-600 mb-4">Get updates on sales and new arrivals</p>
             <div className="flex gap-2">
               <Input 
                 type="email" 
-                placeholder="Email của bạn" 
+                placeholder="Your email" 
                 className="flex-1"
               />
               <Button variant="outline">
-                Đăng Ký
+                Subscribe
               </Button>
             </div>
           </div>

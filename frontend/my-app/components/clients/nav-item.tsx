@@ -20,7 +20,7 @@ export default function NavItem({ children, dropdownContent }: NavItemProps) {
   }
 
   const handleMouseLeave = () => {
-    hoverTimeout = setTimeout(() => setIsOpen(false), 200)
+    hoverTimeout = setTimeout(() => setIsOpen(false), 300)
   }
 
   return (

@@ -30,7 +30,7 @@ export interface Order {
   };
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3100';
 
 export async function getOrders(page: number = 1, limit: number = 10): Promise<{ orders: Order[], total: number }> {
   const response = await fetch(`${API_URL}/orders?page=${page}&limit=${limit}`);

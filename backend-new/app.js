@@ -18,7 +18,7 @@ app.use('/products', productRoutes);
 app.use('/categories', categoryRoutes);
 app.use('/subcategories', subcategoryRoutes);
 
-const PORT = 3002;
+const PORT = 3100;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

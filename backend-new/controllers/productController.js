@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 
 const productController = {
   getProducts: async (req, res) => {
-    const { page = 1, limit = 9, subcategoryId, sku } = req.query;
+    const { page = 1, limit = 9, subcategoryId, categoryId,sku } = req.query;
 
     try {
       let where = {};

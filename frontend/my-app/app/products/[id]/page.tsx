@@ -6,7 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, Truck, ArrowLeftRight, Shield } from 'lucide-react'
 import { Button } from "@/components/ui/button"
-import Footer from '@/app/footer'
+import Footer from '@/components/clients/footer'
 import {
   Accordion,
   AccordionContent,

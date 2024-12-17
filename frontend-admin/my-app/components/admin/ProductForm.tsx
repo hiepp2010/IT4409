@@ -80,7 +80,7 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
 
   const fetchSubcategories = async () => {
     try {
-      const response = await fetch('http://localhost:3002/subcategories');
+      const response = await fetch('http://localhost:3100/subcategories');
       if (!response.ok) {
         throw new Error('Failed to fetch subcategories');
       }
@@ -219,7 +219,7 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
     try {
       let savedProduct: Product
       if (isNewProduct) {
-        const response = await fetch('http://localhost:3002/products', {
+        const response = await fetch('http://localhost:3100/products', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -235,7 +235,7 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
           description: "Product created successfully",
         })
       } else {
-        const response = await fetch(`http://localhost:3002/products/${formData.id}`, {
+        const response = await fetch(`http://localhost:3100/products/${formData.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -269,7 +269,7 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
     if (confirm('Are you sure you want to delete this product?')) {
       setIsLoading(true)
       try {
-        const response = await fetch(`http://localhost:3002/products/${formData.id}`, {
+        const response = await fetch(`http://localhost:3100/products/${formData.id}`, {
           method: 'DELETE',
         })
         if (!response.ok) {
