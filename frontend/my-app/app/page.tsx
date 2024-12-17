@@ -2,8 +2,6 @@
 
 import GreyBCarousel from "../components/clients/carousel"
 import Category from "./category"
-import Product from "../components/clients/product"
-import { getProducts } from "@/lib/product"
 
 export default async function Page(){
   // const products = await getProducts()
@@ -12,7 +10,7 @@ export default async function Page(){
     
       <main className="flex-grow">
         <GreyBCarousel />
-        {/* <Category/> */}
+        <Category/>
       </main>
     </div>
   )

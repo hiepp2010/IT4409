@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCart } from '@/app/contexts/CartContext'
 import { Button } from "@/components/ui/button"
@@ -53,6 +53,35 @@ export default function CheckoutPage() {
     ward: '',
     notes: '',
   })
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    const userId = localStorage.getItem('userId')
+    setIsLoggedIn(!!userId)
+
+    if (userId) {
+      fetchUserInfo(userId)
+    }
+  }, [])
+
+  const fetchUserInfo = async (userId: string) => {
+    try {
+      const response = await fetch(`http://localhost:3100/users/${userId}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch user info')
+      }
+      const userData = await response.json()
+      setShippingInfo(prevInfo => ({
+        ...prevInfo,
+        fullName: userData.fullName || '',
+        email: userData.email || '',
+        phone: userData.phone || '',
+        address: userData.address || '',
+      }))
+    } catch (error) {
+      console.error('Error fetching user info:', error)
+    }
+  }
 
   const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
   const shipping = 0
@@ -94,20 +123,40 @@ export default function CheckoutPage() {
       }
 
       // Create order payload
-      const order = {
-        items,
+      const orderData = {
+        items: items.map(item => ({
+          productId: item.product.id,
+          colorId: item.selectedColor,
+          size: item.selectedSize,
+          quantity: item.quantity,
+          price: item.product.price, // Added price to the item
+        })),
         shippingInfo,
         paymentMethod,
+        subtotal,
+        shipping,
         total,
       }
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // Send order to API
+      const response = await fetch('http://localhost:3100/create-order', { // Updated API endpoint
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({orderData,userId:localStorage.getItem('userId')}),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create order')
+      }
+
+      const data = await response.json()
 
       if (paymentMethod === 'vnpay') {
         // Redirect to VNPAY payment page
-        // In a real application, you would get the URL from your backend
-        window.location.href = `https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?amount=${total}&orderInfo=${encodeURIComponent(JSON.stringify(order))}`
+        clearCart()
+        window.location.href = data.paymentUrl
       } else {
         // Handle COD order
         clearCart()
@@ -115,7 +164,7 @@ export default function CheckoutPage() {
           title: "Order placed successfully!",
           description: "Thank you for your order. We will contact you shortly.",
         })
-        router.push('/order-success')
+        router.push('/')
       }
     } catch (error) {
       toast({
@@ -151,12 +200,14 @@ export default function CheckoutPage() {
           <Card>
             <CardHeader>
               <CardTitle>Thông tin giao hàng</CardTitle>
-              <CardDescription>
-                Bạn đã có tài khoản?{' '}
-                <Link href="/auth" className="text-blue-600 hover:underline">
-                  Đăng nhập
-                </Link>
-              </CardDescription>
+              {!isLoggedIn && (
+                <CardDescription>
+                  Bạn đã có tài khoản?{' '}
+                  <Link href="/auth" className="text-blue-600 hover:underline">
+                    Đăng nhập
+                  </Link>
+                </CardDescription>
+              )}
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">

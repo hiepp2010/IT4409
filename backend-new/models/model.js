@@ -1,8 +1,8 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
-const sequelize = new Sequelize('backend', 'username', 'password', {
-  host: 'winhost',
-  port: 3306,
+const sequelize = new Sequelize('backend', 'root', '1234abcd', {
+  host: 'localhost',
+  port: 3307,
   dialect: 'mysql'
 });
 
@@ -190,6 +190,10 @@ const OrderHistory = sequelize.define('OrderHistory', {
     allowNull: false
   },
   address: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  phoneNumber: {
     type: DataTypes.STRING,
     allowNull: false
   },

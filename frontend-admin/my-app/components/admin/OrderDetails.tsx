@@ -73,9 +73,9 @@ export function OrderDetails({ order }: OrderDetailsProps) {
           </div>
           <div className="space-y-4">
             <div>
-              <p className="font-medium">{order.customer.name}</p>
-              <p className="text-sm text-gray-500">{order.customer.email}</p>
-              <p className="text-sm text-gray-500">+{order.customer.phone}</p>
+              {/* <p className="font-medium">{order.customer.name}</p> */}
+              {/* <p className="text-sm text-gray-500">{order.customer.email}</p>
+              <p className="text-sm text-gray-500">+{order.customer.phone}</p> */}
             </div>
             <Button variant="outline" className="w-full">
               View Profile
@@ -120,10 +120,10 @@ export function OrderDetails({ order }: OrderDetailsProps) {
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-red-500 rounded" />
-            <span>Mastercard **** **** **** {order.paymentInfo.last4}</span>
+            {/* <span>Mastercard **** **** **** {order.paymentInfo.last4}</span> */}
           </div>
-          <p className="text-sm text-gray-500">Business name: {order.paymentInfo.businessName}</p>
-          <p className="text-sm text-gray-500">Phone: {order.paymentInfo.phone}</p>
+          {/* <p className="text-sm text-gray-500">Business name: {order.paymentInfo.businessName}</p> */}
+          {/* <p className="text-sm text-gray-500">Phone: {order.paymentInfo.phone}</p> */}
         </div>
       </Card>
 
@@ -148,7 +148,7 @@ export function OrderDetails({ order }: OrderDetailsProps) {
               <TableHead className="text-right">Total</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          {/* <TableBody>
             {order.products.map((product: any) => (
               <TableRow key={product.id}>
                 <TableCell>
@@ -167,29 +167,29 @@ export function OrderDetails({ order }: OrderDetailsProps) {
                 <TableCell className="text-right">₹{product.total.toFixed(2)}</TableCell>
               </TableRow>
             ))}
-          </TableBody>
+          </TableBody> */}
         </Table>
 
         <div className="mt-6 space-y-2">
           <div className="flex justify-between text-sm">
             <span>Subtotal</span>
-            <span>₹{order.subtotal.toFixed(2)}</span>
+            <span>₹{order.subtotal}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Tax (20%)</span>
-            <span>₹{order.tax.toFixed(2)}</span>
+            <span>₹{order.tax}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Discount</span>
-            <span>₹{order.discount.toFixed(2)}</span>
+            <span>₹{order.discount}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Shipping Rate</span>
-            <span>₹{order.shippingRate.toFixed(2)}</span>
+            <span>₹{order.shippingRate}</span>
           </div>
           <div className="flex justify-between font-semibold text-lg pt-4 border-t">
             <span>Total</span>
-            <span>₹{order.total.toFixed(2)}</span>
+            <span>₹{order.total}</span>
           </div>
         </div>
       </Card>

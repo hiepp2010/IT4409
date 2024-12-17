@@ -1,16 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-
-interface User {
-  username: string;
-  password: string;
-}
+import { toast } from "@/hooks/use-toast"
+import Link from 'next/link'
 
 export default function AuthPage() {
   const router = useRouter()
@@ -19,47 +16,46 @@ export default function AuthPage() {
     username: '',
     password: ''
   })
-  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    // Check if user is already logged in
-    const user = localStorage.getItem('user')
-    if (user) {
-      router.push('/') // Redirect to home if already logged in
-    }
-  }, [router])
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
+    setIsLoading(true)
 
-    if (isLogin) {
-      // Handle Login
-      const users = JSON.parse(localStorage.getItem('users') || '[]')
-      const user = users.find((u: User) => 
-        u.username === formData.username && u.password === formData.password
-      )
+    try {
+      const endpoint = isLogin ? '/login' : '/signup'
+      const response = await fetch(`http://localhost:3100/auth${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
 
-      if (user) {
-        localStorage.setItem('user', JSON.stringify(user))
+      const data = await response.json()
+
+      if (response.ok) {
+        localStorage.setItem('userId', data.userId)
+        toast({
+          title: isLogin ? "Logged in successfully" : "Signed up successfully",
+          description: "Welcome to our store!",
+        })
         router.push('/')
       } else {
-        setError('Invalid username or password')
+        toast({
+          title: "Error",
+          description: data.error,
+          variant: "destructive",
+        })
       }
-    } else {
-      // Handle Sign Up
-      const users = JSON.parse(localStorage.getItem('users') || '[]')
-      const userExists = users.some((u: User) => u.username === formData.username)
-
-      if (userExists) {
-        setError('Username already exists')
-        return
-      }
-
-      users.push(formData)
-      localStorage.setItem('users', JSON.stringify(users))
-      localStorage.setItem('user', JSON.stringify(formData))
-      router.push('/')
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -76,7 +72,7 @@ export default function AuthPage() {
         <CardHeader>
           <CardTitle>{isLogin ? 'Login' : 'Sign Up'}</CardTitle>
           <CardDescription>
-            Enter your credentials to access the admin dashboard.
+            Enter your credentials to access the store.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -104,11 +100,8 @@ export default function AuthPage() {
                 required
               />
             </div>
-            {error && (
-              <p className="text-sm text-red-500">{error}</p>
-            )}
-            <Button type="submit" className="w-full bg-black hover:bg-gray-800">
-              {isLogin ? 'Log in' : 'Sign up'}
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Processing...' : (isLogin ? 'Log in' : 'Sign up')}
             </Button>
             <p className="text-center text-sm text-gray-600">
               {isLogin ? "Don't have an account? " : "Already have an account? "}

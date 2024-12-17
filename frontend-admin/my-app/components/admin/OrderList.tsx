@@ -106,7 +106,7 @@ export default function OrderList({ orders }: OrderListProps) {
                 </Badge>
               </TableCell>
               <TableCell className="text-right font-medium">
-                ${order.totalAmount.toFixed(2)}
+                ${order.totalAmount}
               </TableCell>
               <TableCell>
                 <DropdownMenu>

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import NavItem from "./nav-item"
 import { Button } from "@/components/ui/button"
-import { Search, ShoppingCart, User, LogOut } from 'lucide-react'
+import { Search, ShoppingCart, User, LogOut, ClipboardList, Settings } from 'lucide-react'
 import { useCart } from '@/app/contexts/CartContext'
 import {
   DropdownMenu,
@@ -14,6 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { toast } from "@/hooks/use-toast"
 
 interface Category {
   id: string;
@@ -35,8 +36,8 @@ export default function NavBar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   useEffect(() => {
-    const user = localStorage.getItem('user')
-    setIsLoggedIn(!!user)
+    const userId = localStorage.getItem('userId')
+    setIsLoggedIn(!!userId)
   }, [])
 
   useEffect(() => {
@@ -59,9 +60,13 @@ export default function NavBar() {
   }, [])
 
   const handleLogout = () => {
-    localStorage.removeItem('user')
+    localStorage.removeItem('userId')
     setIsLoggedIn(false)
-    router.push('/auth')
+    toast({
+      title: "Logged out successfully",
+      description: "You have been logged out of your account.",
+    })
+    router.push('/')
   }
 
   return (
@@ -127,6 +132,14 @@ export default function NavBar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => router.push('/order-history')}>
+                    <ClipboardList className="mr-2 h-4 w-4" />
+                    Order History
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push('/profile')}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Edit Profile
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout

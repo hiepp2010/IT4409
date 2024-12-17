@@ -1,6 +1,6 @@
 'use client'
 
-import { useCart } from '@/app/contexts/CartContext'
+import { useCart } from "../contexts/CartContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Image from 'next/image'
@@ -12,7 +12,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 export default function CartPage() {
   const { items, removeItem, adjustQuantity, clearCart } = useCart()
-  console.log(items)
   const [isSticky, setIsSticky] = useState(false)
 
   const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
@@ -40,7 +39,7 @@ export default function CartPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">Your Shopping Cart</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">Giỏ Hàng Của Bạn</h1>
       
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Main Cart Section */}
@@ -54,10 +53,10 @@ export default function CartPage() {
                 className="text-center py-12 bg-gray-50 rounded-lg"
               >
                 <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-600 mb-4 text-lg">Your cart is empty</p>
+                <p className="text-gray-600 mb-4 text-lg">Giỏ hàng của bạn đang trống</p>
                 <Link href="/">
                   <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                    Continue Shopping
+                    Tiếp Tục Mua Sắm
                   </Button>
                 </Link>
               </motion.div>
@@ -93,9 +92,9 @@ export default function CartPage() {
                         <div className="flex justify-between">
                           <div>
                             <h3 className="font-semibold text-lg">{item.product.name}</h3>
-                            <p className="text-sm text-gray-500">SKU: {item.product.sku}</p>
+                            <p className="text-sm text-gray-500">MSP: {item.product.id}</p>
                             <p className="text-sm text-gray-500">
-                              Color: {item.selectedColor} | Size: {item.selectedSize}
+                              Màu: {color?.name} | Kích thước: {item.selectedSize}
                             </p>
                           </div>
                           <p className="font-semibold text-lg">${item.product.price.toFixed(2)}</p>
@@ -178,39 +177,44 @@ export default function CartPage() {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="bg-gray-50 p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+            <h2 className="text-xl font-semibold mb-4">Tổng Đơn Hàng</h2>
             <div className="space-y-4">
               <div className="flex justify-between">
-                <span>Subtotal:</span>
+                <span>Tạm tính:</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span>Shipping:</span>
-                <span>{shipping === 0 ? 'Free' : `$${shipping}`}</span>
+                <span>Phí vận chuyển:</span>
+                <span>{shipping === 0 ? 'Miễn phí' : `$${shipping}`}</span>
               </div>
               <Separator />
               <div className="flex justify-between font-semibold text-lg">
-                <span>Total:</span>
+                <span>Tổng cộng:</span>
                 <span>${total.toFixed(2)}</span>
               </div>
-              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-6">
-                Proceed to Checkout
+              <Button 
+                className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white text-lg py-6"
+                asChild
+              >
+                <Link href="/checkout">
+                  Proceed to Checkout
+                </Link>
               </Button>
             </div>
           </div>
 
           {/* Newsletter Section */}
           <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold mb-4">Subscribe to Our Newsletter</h3>
-            <p className="text-sm text-gray-600 mb-4">Get updates on sales and new arrivals</p>
+            <h3 className="text-lg font-semibold mb-4">Đăng Ký Nhận Thông Tin</h3>
+            <p className="text-sm text-gray-600 mb-4">Nhận thông tin ưu đãi và xu hướng mới nhất</p>
             <div className="flex gap-2">
               <Input 
                 type="email" 
-                placeholder="Your email" 
+                placeholder="Email của bạn" 
                 className="flex-1"
               />
               <Button variant="outline">
-                Subscribe
+                Đăng Ký
               </Button>
             </div>
           </div>

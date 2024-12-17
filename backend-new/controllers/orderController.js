@@ -1,4 +1,14 @@
-const { Product, OrderItem, OrderHistory } = require("../models/model");
+const { Product, OrderItem, OrderHistory, Color, Size } = require("../models/model");
+const { Sequelize, DataTypes } = require('sequelize');
+const moment = require("moment");
+const querystring = require("qs");
+const crypto = require("crypto");
+
+const sequelize = new Sequelize('backend', 'root', '1234abcd', {
+  host: 'localhost',
+  port: 3307,
+  dialect: 'mysql'
+});
 
 const _sortObject = (obj) => {
   let sorted = {};
@@ -13,16 +23,16 @@ const paymentWithVnpay = async ({ total_amount, customer_id, ipAddr }) => {
   try {
     const tmnCode = "N9ZU3Q90"; // Replace with your actual TMN code
     const secretKey = "G15YSOY3R1T0O7LNCPUXY9K6D1KEF48K"; // Replace with your actual secret key
-    const vnpUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    const returnUrl = "https://it-4409-hjva.vercel.app";
+    const vnpUrl = "https://sandbox.vnpayment.vn/pa ymentv2/vpcpay.html";
+    const returnUrl = "localhost:3000";
 
     // Generate timestamps
     const date = moment();
-    const createDate = date.format("yyyymmddHHMMss");
-    const orderId = date.format("HHMMss");
-
+    const createDate = date.format("YYYYMMDDHHmmss");
+    const orderId = date.format("HHmmss");
+    const expireDate = moment().add(6, "hours").format("YYYYMMDDHHmmss");
     const amount = total_amount; // Assuming total_amount is in VND
-    const orderInfo = `Thanh toan cho khach hang ${customer_id} gia tri ${total_amount}`;
+    const orderInfo = "Thanhtoanchokhachhang${customer_id}giatri${total_amount}";
     const orderType = "200000"; // mặt hàng thời trang
     const locale = "vn"; // Locale (e.g., "vn" for Vietnamese)
     const currCode = "VND"; // Currency code
@@ -40,15 +50,17 @@ const paymentWithVnpay = async ({ total_amount, customer_id, ipAddr }) => {
       vnp_ReturnUrl: returnUrl,
       vnp_IpAddr: ipAddr,
       vnp_CreateDate: createDate,
+      vnp_ExpireDate: expireDate,
+   //   vnp_BankCode: "NCB",
     };
-
-    // Sort parameters and create query string
     vnp_Params = _sortObject(vnp_Params);
 
     const signData = querystring.stringify(vnp_Params, { encode: false });
     const hmac = crypto.createHmac("sha512", secretKey);
     const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
     vnp_Params["vnp_SecureHash"] = signed;
+
+    // Sort parameters and create query string
 
     const paymentUrl = `${vnpUrl}?${querystring.stringify(vnp_Params, {
       encode: false,
@@ -60,46 +72,46 @@ const paymentWithVnpay = async ({ total_amount, customer_id, ipAddr }) => {
   }
 };
 const createOrder = async (req, res) => {
-  const {
-    customer_id,
-    phone_number,
-    address,
-    payment_method = "COD",
-    items,
+  const{
+    userId,
+    orderData
   } = req.body;
 
-  const ipAddr =
+  let ipAddr =
     req.headers["x-forwarded-for"] ||
     req.connection?.remoteAddress ||
     req.socket?.remoteAddress ||
     req.connection?.socket?.remoteAddress ||
     "127.0.0.1";
+    if (ipAddr === "::1" || ipAddr === "::1%0") {
+      ipAddr = "127.0.0.1";
+    }
   // Validation check
-  if (
-    !customer_id ||
-    !phone_number ||
-    !address ||
-    !items ||
-    items.length === 0
-  ) {
-    return res
-      .status(400)
-      .json({ message: "Thông tin đơn hàng không hợp lệ." });
-  }
+  // if (
+  //   !customer_id ||
+  //   !phone_number ||
+  //   !address ||
+  //   !items ||
+  //   items.length === 0
+  // ) {
+  //   return res
+  //     .status(400)
+  //     .json({ message: "Thông tin đơn hàng không hợp lệ." });
+  // }
 
-  const orderNo = `ORD${Date.now()}`; // Generate order number
+  const orderNo = 'ORD${Date.now()}'; // Generate order number
   let total_amount = 0;
   let total_discount = 0;
 
   // Calculate total amount and total discount
-  items.forEach((item) => {
+  orderData.items.forEach((item) => {
     const { price, quantity, discount_amount } = item;
     total_amount += price * quantity;
     total_discount += discount_amount ? discount_amount * quantity : 0;
   });
 
   // Start a transaction
-  const transaction = await sequelize.transaction();
+  // const transaction = await sequelize.transaction();
 
   try {
     // Create order in OrderHistory
@@ -107,64 +119,112 @@ const createOrder = async (req, res) => {
       {
         status: "Processing",
         totalAmount: total_amount,
-        totalDiscount: total_discount,
-        paymentMethod: payment_method,
-        orderNo: orderNo,
-        phoneNumber: phone_number,
-        address: address,
-        userId: customer_id,
+        paymentMethod: orderData.paymentMethod,
+        phoneNumber: orderData.shippingInfo.phone,
+        address: orderData.shippingInfo.address,
+        userId: userId,
       },
-      { transaction } // Ensure this operation is part of the transaction
     );
 
-    // Process each item in the order
-    for (const item of items) {
-      const { product_id, quantity, price, discount_id, discount_amount } =
-        item;
-
-      // Create order item
-      await OrderItem.create(
-        {
-          discountId: discount_id || null,
-          productId: product_id,
-          orderHistoryId: order.id,
-          paymentAmount: price * quantity - (discount_amount || 0),
-          price: price,
-          discountAmount: discount_amount || 0,
-          quantity: quantity,
-        },
-        { transaction } // Ensure this operation is part of the transaction
-      );
-
-      // Update product stock quantity
-      await Product.update(
-        { stock_quantity: sequelize.literal(`stock_quantity - ${quantity}`) },
-        {
-          where: { id: product_id },
-          transaction, // Ensure this operation is part of the transaction
-        }
-      );
+    // // Process each item in the order
+    for (const item of orderData.items) {  
+      await OrderItem.create({ orderHistoryId: order.id, productId: item.productId, quantity: item.quantity, price: item.price, size:item.size});
+      
+      const color = await Color.findOne({ where: { productId: item.productId, name: item.colorId }});
+      const sizeModel = await Size.findOne({ where: { colorId: color.id, name: item.size } }); 
+      if (sizeModel) { sizeModel.quantity -= item.quantity; await sizeModel.save();}
+     
     }
 
     // Commit the transaction
-    await transaction.commit();
-    if (payment_method === "VNPAY") {
+    // await transaction.commit();
+    if (orderData.paymentMethod === "vnpay") {
       const paymentUrl = await paymentWithVnpay({
         total_amount,
-        customer_id,
+        user_id,
         ipAddr,
       });
-      res.redirect(paymentUrl);
+      console.log(paymentUrl);
+      res.status(200).json({ paymentUrl: paymentUrl });
+      // res.redirect(paymentUrl);
+    }
+    else{
+      res.status(200).json({"status":"ok"})
     }
     // Send response back to the client
-    return res.status(200).json({ orderNo });
+    //  res.status(200).json({ orderNo });
   } catch (err) {
     // Rollback the transaction in case of an error
-    if (transaction) await transaction.rollback();
+    // if (transaction) await transaction.rollback();
     console.error(err);
     return res
       .status(500)
       .json({ error: "Internal server error", details: err.message });
   }
 };
-module.exports = { createOrder };
+
+const getOrdersByUserId = async (req,res)=>{
+  const{userId} = req.params;
+
+  console.log(userId)
+  
+  try{
+    const orders = await OrderHistory.findAll ({
+      where: { userId},
+      include:[
+        {model: OrderItem, as: 'orderItems' }
+      ]
+    });
+    const allOrder = await OrderHistory.findAll ({
+      include:[
+        {model: OrderItem, as: 'orderItems' }
+      ]
+    });
+
+    console.log(allOrder)
+
+    if(orders.length == 0 ){
+      return res.status(404).json({ error: 'No orders found for this user' });
+    }
+    
+    res.status(200).json(orders)
+  } catch (error){
+    res.status(500).json({ error: error.message});
+  }
+};
+
+const getAllOrders = async(req,res) => {
+  const { page = 1, limit = 10 } = req.query;
+  try{
+    const orders = await OrderHistory.findAndCountAll({
+      include: [
+        {model: OrderItem, as: 'orderItems'}
+      ],
+    });
+    console.log(orders)
+    res.status(200).json({orders:orders.rows, total:orders.count})
+  } catch (error){
+    console.log(error)
+    res.status(500).json({error:error.message})
+  }
+}
+
+const getOrderById = async(req,res) => {
+  const {id} = req.params;
+
+  try{
+    const order = await OrderHistory.findByPk(id,{
+      include: [
+        {model: OrderItem, as: 'orderItems'}
+      ]
+    })
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+    res.status(200).json(order);
+  } catch (error) {
+    res.status(500).json({error:error.message})
+  }
+}
+
+
+
+module.exports = { createOrder, getOrdersByUserId, getAllOrders, getOrderById };

@@ -30,10 +30,10 @@ export interface Order {
   };
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3100';
+const API_URL ='http://localhost:3100';
 
 export async function getOrders(page: number = 1, limit: number = 10): Promise<{ orders: Order[], total: number }> {
-  const response = await fetch(`${API_URL}/orders?page=${page}&limit=${limit}`);
+  const response = await fetch(`${API_URL}/all`);
   if (!response.ok) {
     throw new Error('Failed to fetch orders');
   }
@@ -76,7 +76,7 @@ export async function getOrders(page: number = 1, limit: number = 10): Promise<{
 }
 
 export async function getOrderById(id: string): Promise<Order | null> {
-  const response = await fetch(`${API_URL}/orders/${id}`);
+  const response = await fetch(`${API_URL}/${id}`);
   if (!response.ok) {
     if (response.status === 404) {
       return null;
