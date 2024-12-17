@@ -1,102 +1,118 @@
-import { faker } from '@faker-js/faker';
-
-export interface OrderProduct {
+export interface OrderItem {
   id: string;
-  name: string;
-  orderId: string;
+  orderHistoryId: string;
+  productId: string;
   quantity: number;
-  total: number;
-  image: string;
+  price: number;
+  product?: {
+    id: string;
+    name: string;
+    imagePaths: string[];
+  };
 }
 
 export interface Order {
   id: string;
-  date: string;
-  status: 'delivered' | 'cancelled' | 'pending';
-  customer: {
+  userId: string;
+  totalAmount: number;
+  address: string;
+  paymentMethod: string;
+  status: 'pending' | 'delivered' | 'cancelled';
+  createdAt: string;
+  updatedAt: string;
+  orderItems: OrderItem[];
+  user?: {
+    id: string;
     name: string;
     email: string;
     phone: string;
     avatar: string;
   };
-  shipping: string;
-  paymentMethod: string;
-  shippingAddress: string;
-  paymentInfo: {
-    last4: string;
-    businessName: string;
-    phone: string;
-  };
-  note: string;
-  products: OrderProduct[];
-  subtotal: number;
-  tax: number;
-  discount: number;
-  shippingRate: number;
-  total: number;
-  amount: number;
 }
 
-function generateRandomOrder(): Order {
-  const productCount = faker.number.int({ min: 1, max: 5 });
-  const products: OrderProduct[] = Array.from({ length: productCount }, () => ({
-    id: faker.string.uuid(),
-    name: faker.commerce.productName(),
-    orderId: faker.string.alphanumeric(6).toUpperCase(),
-    quantity: faker.number.int({ min: 1, max: 10 }),
-    total: parseFloat(faker.commerce.price({ min: 10, max: 1000 })),
-    image: faker.image.url(),
-  }));
-
-  const subtotal = products.reduce((sum, product) => sum + product.total, 0);
-  const tax = subtotal * 0.1; // 10% tax
-  const discount = subtotal * faker.number.float({ min: 0, max: 0.2 }); // 0-20% discount
-  const shippingRate = faker.number.float({ min: 0, max: 50 });
-  const total = subtotal + tax - discount + shippingRate;
-
-  return {
-    id: `ORD${faker.string.numeric(5)}`,
-    date: faker.date.recent({ days: 30 }).toISOString(),
-    status: faker.helpers.arrayElement(['delivered', 'cancelled', 'pending']),
-    customer: {
-      name: faker.person.fullName(),
-      email: faker.internet.email(),
-      phone: faker.phone.number(),
-      avatar: faker.image.avatar(),
-    },
-    shipping: faker.helpers.arrayElement(['Standard', 'Express', 'Next Day']),
-    paymentMethod: faker.helpers.arrayElement(['Credit Card', 'PayPal', 'Bank Transfer']),
-    shippingAddress: faker.location.streetAddress(true),
-    paymentInfo: {
-      last4: faker.finance.creditCardNumber('####'),
-      businessName: faker.company.name(),
-      phone: faker.phone.number(),
-    },
-    note: "note",
-    products,
-    subtotal,
-    tax,
-    discount,
-    shippingRate,
-    total,
-    amount: total,
-  };
-}
-
-export const orders: Order[] = Array.from({ length: 100 }, generateRandomOrder);
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002';
 
 export async function getOrders(page: number = 1, limit: number = 10): Promise<{ orders: Order[], total: number }> {
-  const start = (page - 1) * limit;
-  const end = start + limit;
-  const paginatedOrders = orders.slice(start, end);
+  const response = await fetch(`${API_URL}/orders?page=${page}&limit=${limit}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch orders');
+  }
+  const data = await response.json();
+
+  const orders: Order[] = data.orders.map((order: any) => ({
+    id: order.id,
+    userId: order.userId,
+    totalAmount: order.totalAmount,
+    address: order.address,
+    paymentMethod: order.paymentMethod,
+    status: order.status,
+    createdAt: order.createdAt,
+    updatedAt: order.updatedAt,
+    orderItems: order.orderItems.map((item: any) => ({
+      id: item.id,
+      orderHistoryId: item.orderHistoryId,
+      productId: item.productId,
+      quantity: item.quantity,
+      price: item.price,
+      product: item.product ? {
+        id: item.product.id,
+        name: item.product.name,
+        imagePaths: item.product.imagePaths,
+      } : undefined,
+    })),
+    user: order.user ? {
+      id: order.user.id,
+      name: order.user.name,
+      email: order.user.email,
+      phone: order.user.phone,
+      avatar: order.user.avatar || '/placeholder.svg',
+    } : undefined,
+  }));
+
   return {
-    orders: paginatedOrders,
-    total: orders.length
+    orders,
+    total: data.total
   };
 }
 
 export async function getOrderById(id: string): Promise<Order | null> {
-  const order = orders.find(order => order.id === id);
-  return order || null;
+  const response = await fetch(`${API_URL}/orders/${id}`);
+  if (!response.ok) {
+    if (response.status === 404) {
+      return null;
+    }
+    throw new Error('Failed to fetch order');
+  }
+  const order = await response.json();
+
+  return {
+    id: order.id,
+    userId: order.userId,
+    totalAmount: order.totalAmount,
+    address: order.address,
+    paymentMethod: order.paymentMethod,
+    status: order.status,
+    createdAt: order.createdAt,
+    updatedAt: order.updatedAt,
+    orderItems: order.orderItems.map((item: any) => ({
+      id: item.id,
+      orderHistoryId: item.orderHistoryId,
+      productId: item.productId,
+      quantity: item.quantity,
+      price: item.price,
+      product: item.product ? {
+        id: item.product.id,
+        name: item.product.name,
+        imagePaths: item.product.imagePaths,
+      } : undefined,
+    })),
+    user: order.user ? {
+      id: order.user.id,
+      name: order.user.name,
+      email: order.user.email,
+      phone: order.user.phone,
+      avatar: order.user.avatar || '/placeholder.svg',
+    } : undefined,
+  };
 }
 

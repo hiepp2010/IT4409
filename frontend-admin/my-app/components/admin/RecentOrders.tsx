@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -12,13 +12,25 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { orders } from "@/lib/orders"
+import { Order, getOrders } from "@/lib/orders"
 
 const ITEMS_PER_PAGE = 6
 
 export function RecentOrders() {
   const [selectedOrders, setSelectedOrders] = useState<string[]>([])
-  const recentOrders = orders.slice(0, ITEMS_PER_PAGE)
+  const [orders, setOrders] = useState<Order[]>([])
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const { orders } = await getOrders(1, 6) // Fetch first 6 orders
+        setOrders(orders)
+      } catch (error) {
+        console.error('Error fetching orders:', error)
+      }
+    }
+    fetchOrders()
+  }, [])
 
   const toggleOrder = (orderId: string) => {
     setSelectedOrders(prev => 
@@ -30,7 +42,7 @@ export function RecentOrders() {
 
   const toggleAll = () => {
     setSelectedOrders(prev => 
-      prev.length === recentOrders.length ? [] : recentOrders.map(order => order.id)
+      prev.length === orders.length ? [] : orders.map(order => order.id)
     )
   }
 
@@ -40,11 +52,10 @@ export function RecentOrders() {
         <TableRow>
           <TableHead className="w-12">
             <Checkbox 
-              checked={selectedOrders.length === recentOrders.length}
+              checked={selectedOrders.length === orders.length}
               onCheckedChange={toggleAll}
             />
           </TableHead>
-          <TableHead>Product</TableHead>
           <TableHead>Order ID</TableHead>
           <TableHead>Date</TableHead>
           <TableHead>Customer Name</TableHead>
@@ -53,7 +64,7 @@ export function RecentOrders() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {recentOrders.map((order) => (
+        {orders.map((order) => (
           <TableRow key={order.id}>
             <TableCell>
               <Checkbox 
@@ -61,16 +72,15 @@ export function RecentOrders() {
                 onCheckedChange={() => toggleOrder(order.id)}
               />
             </TableCell>
-            <TableCell>{order.productName}</TableCell>
             <TableCell>#{order.id}</TableCell>
-            <TableCell>{order.date}</TableCell>
+            <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
             <TableCell>
               <div className="flex items-center gap-2">
                 <Avatar className="h-6 w-6">
-                  <AvatarImage src={order.customer.avatar} />
-                  <AvatarFallback>{order.customer.name[0]}</AvatarFallback>
+                  <AvatarImage src={order.user?.avatar} />
+                  <AvatarFallback>{order.user?.name?.[0] || 'U'}</AvatarFallback>
                 </Avatar>
-                {order.customer.name}
+                {order.user?.name || 'Unknown User'}
               </div>
             </TableCell>
             <TableCell>
@@ -84,7 +94,7 @@ export function RecentOrders() {
                 {order.status}
               </Badge>
             </TableCell>
-            <TableCell className="text-right">₹{order.amount.toFixed(2)}</TableCell>
+            <TableCell className="text-right">${order.totalAmount.toFixed(2)}</TableCell>
           </TableRow>
         ))}
       </TableBody>

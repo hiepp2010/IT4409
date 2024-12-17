@@ -1,8 +1,8 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
-const sequelize = new Sequelize('backend', 'root', '1234abcd', {
-  host: 'localhost',
-  port: 3307,
+const sequelize = new Sequelize('backend', 'username', 'password', {
+  host: 'winhost',
+  port: 3306,
   dialect: 'mysql'
 });
 
@@ -55,7 +55,7 @@ const Product = sequelize.define('Product', {
   discountedPrice: {
     type: DataTypes.FLOAT
   },
-  categoryId: {
+  subcategoryId: {
     type: DataTypes.BIGINT,
     references: {
       model: SubCategory,
@@ -216,12 +216,16 @@ const OrderItem = sequelize.define('OrderItem', {
       key: 'id'
     }
   },
-  productId: {
+  colorId: {
     type: DataTypes.BIGINT,
     references: {
-      model: Product,
+      model: Color,
       key: 'id'
     }
+  },
+  size: {
+    type: DataTypes.STRING,
+    allowNull: false
   },
   quantity: {
     type: DataTypes.INTEGER,
@@ -237,8 +241,8 @@ const OrderItem = sequelize.define('OrderItem', {
 Category.hasMany(SubCategory, { foreignKey: 'categoryId', as: 'subCategories' });
 SubCategory.belongsTo(Category, { foreignKey: 'categoryId', as: 'category' });
 
-SubCategory.hasMany(Product, { foreignKey: 'categoryId', as: 'products' });
-Product.belongsTo(SubCategory, { foreignKey: 'categoryId', as: 'subCategory' });
+SubCategory.hasMany(Product, { foreignKey: 'subcategoryId', as: 'products' });
+Product.belongsTo(SubCategory, { foreignKey: 'subcategoryId', as: 'subCategory' });
 
 Product.hasMany(Color, { foreignKey: 'productId', as: 'colors' });
 Color.belongsTo(Product, { foreignKey: 'productId', as: 'product' });
@@ -258,8 +262,8 @@ OrderHistory.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 OrderHistory.hasMany(OrderItem, { foreignKey: 'orderHistoryId', as: 'orderItems' });
 OrderItem.belongsTo(OrderHistory, { foreignKey: 'orderHistoryId', as: 'orderHistory' });
 
-Product.hasMany(OrderItem, { foreignKey: 'productId', as: 'orderItems' });
-OrderItem.belongsTo(Product, { foreignKey: 'productId', as: 'product' });
+Color.hasMany(OrderItem, { foreignKey: 'colorId', as: 'orderItems' });
+OrderItem.belongsTo(Color, { foreignKey: 'colorId', as: 'color' });
 
 // Sync models with the database
 (async () => {

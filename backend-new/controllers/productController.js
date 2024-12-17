@@ -46,13 +46,11 @@ const productController = {
   },
 
   createProduct: async (req, res) => {
-    const { name, description, categoryId, subcategoryId, brand, sku, price, discountedPrice, tags, colors } = req.body;
-    console.log(subcategoryId)
+    const { name, description, subcategoryId, brand, sku, price, discountedPrice, tags, colors } = req.body;
     try {
       const product = await Product.create({
         name,
         description,
-        categoryId,
         subcategoryId,
         brand,
         sku,
@@ -62,7 +60,6 @@ const productController = {
       });
 
       if (colors) {
-        console.log(colors)
         for (const colorData of colors) {
           const color = await Color.create({ name: colorData.name, productId: product.id });
           if (colorData.sizes) {
@@ -87,14 +84,38 @@ const productController = {
 
   updateProduct: async (req, res) => {
     const { id } = req.params;
-    const { name, description, categoryId, subcategoryId, brand, sku, price, discountedPrice, tags } = req.body;
+    const { name, description, subcategoryId, brand, sku, price, discountedPrice, tags, colors } = req.body;
 
     try {
-      const product = await Product.findByPk(id);
+      const product = await Product.findByPk(id, {
+        include: [
+          { model: Color, as: 'colors', include: [{ model: Size, as: 'sizes' }, { model: ImagePath, as: 'imagePaths' }] },
+        ]
+      });
 
       if (!product) return res.status(404).json({ error: 'Product not found' });
 
-      await product.update({ name, description, categoryId, subcategoryId, brand, sku, price, discountedPrice, tags });
+      await product.update({ name, description, subcategoryId, brand, sku, price, discountedPrice, tags });
+
+      // Clear existing colors, sizes, and image paths
+      await Color.destroy({ where: { productId: product.id } });
+
+      if (colors) {
+        for (const colorData of colors) {
+          const color = await Color.create({ name: colorData.name, productId: product.id });
+          if (colorData.sizes) {
+            for (const sizeData of colorData.sizes) {
+              await Size.create({ name: sizeData.name, quantity: sizeData.quantity, colorId: color.id });
+            }
+          }
+
+          if (colorData.imagePaths) {
+            for (const imagePath of colorData.imagePaths) {
+              await ImagePath.create({ path: imagePath, colorId: color.id });
+            }
+          }
+        }
+      }
 
       res.status(200).json(product);
     } catch (error) {
