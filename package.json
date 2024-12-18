@@ -33,5 +33,11 @@
   "devDependencies": {
     "cross-env": "^7.0.3",
     "expect.js": "^0.3.1"
-  }
+  },
+  "name": "package.json",
+  "description": "��#\u0000 \u0000I\u0000T\u00004\u00004\u00000\u00009\u0000\r\u0000 \u0000",
+  "version": "1.0.0",
+  "main": "eslint.config.js",
+  "author": "",
+  "license": "ISC"
 }
