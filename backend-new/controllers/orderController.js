@@ -144,7 +144,6 @@ const createOrder = async (req, res) => {
         user_id,
         ipAddr,
       });
-      console.log(paymentUrl);
       res.status(200).json({ paymentUrl: paymentUrl });
       // res.redirect(paymentUrl);
     }
@@ -166,7 +165,6 @@ const createOrder = async (req, res) => {
 const getOrdersByUserId = async (req,res)=>{
   const{userId} = req.params;
 
-  console.log(userId)
   
   try{
     const orders = await OrderHistory.findAll ({
@@ -181,7 +179,6 @@ const getOrdersByUserId = async (req,res)=>{
       ]
     });
 
-    console.log(allOrder)
 
     if(orders.length == 0 ){
       return res.status(404).json({ error: 'No orders found for this user' });
@@ -201,10 +198,8 @@ const getAllOrders = async(req,res) => {
         {model: OrderItem, as: 'orderItems'}
       ],
     });
-    console.log(orders)
     res.status(200).json({orders:orders.rows, total:orders.count})
   } catch (error){
-    console.log(error)
     res.status(500).json({error:error.message})
   }
 }
