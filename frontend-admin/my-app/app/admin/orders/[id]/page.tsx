@@ -4,13 +4,14 @@ import { getOrderById } from "@/lib/orders"
 import { notFound } from "next/navigation"
 
 interface OrderDetailsPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function OrderDetailsPage({ params }: OrderDetailsPageProps) {
-  const order = await getOrderById(params.id)
+  const {id} = await params
+  const order = await getOrderById(id)
 
   if (!order) {
     notFound()

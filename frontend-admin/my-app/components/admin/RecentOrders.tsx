@@ -21,7 +21,7 @@ export function RecentOrders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const { orders } = await getOrders(1, 6) // Fetch first 6 orders
+        const { orders } = await getOrders() // Fetch first 6 orders
         setOrders(orders)
       } catch (error) {
         console.error('Error fetching orders:', error)

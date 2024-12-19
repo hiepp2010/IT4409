@@ -42,7 +42,8 @@ export function SubCategoryList({ initialCategory }: SubCategoryListProps) {
           name: newSubCategoryName,
           parentId: category.id,
           itemCount: 0,
-          image: '/placeholder.svg'
+          image: '/placeholder.svg',
+          categoryId: ""
         })
         setNewSubCategoryName("")
         toast({

@@ -17,7 +17,6 @@ export interface CustomerOrder {
   subtotal: number;
   shipping: number;
   discount: number;
-  total: number;
 }
 
 export interface Customer {
@@ -60,7 +59,6 @@ export const customers: Customer[] = Array.from({ length: 50 }, () => {
     subtotal: parseFloat(faker.commerce.price({ min: 100, max: 1000 })),
     shipping: 5.50,
     discount: parseFloat(faker.commerce.price({ min: 5, max: 50 })),
-    total: parseFloat(faker.commerce.price({ min: 100, max: 1000 }))
   }));
 
   const completedOrders = orders.filter(order => order.status === 'completed').length;
@@ -70,7 +68,7 @@ export const customers: Customer[] = Array.from({ length: 50 }, () => {
     id: faker.string.uuid(),
     name: faker.person.fullName(),
     email: faker.internet.email().toLowerCase(),
-    phone: faker.phone.number('(###) ###-####'),
+    phone: faker.phone.number(),
     joinDate: faker.date.past({ years: 1 }).toISOString(),
     avatar: faker.image.avatar(),
     personalInfo: {

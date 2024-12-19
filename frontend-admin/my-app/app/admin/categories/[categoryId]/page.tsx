@@ -7,13 +7,14 @@ import Link from "next/link"
 import { ArrowLeft } from 'lucide-react'
 
 interface CategoryPageProps {
-  params: {
+  params: Promise<{
     categoryId: string
-  }
+  }>
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
-  const category = await getCategoryById(params.categoryId)
+  const {categoryId} = await params;
+  const category = await getCategoryById(categoryId)
 
   if (!category) {
     notFound()

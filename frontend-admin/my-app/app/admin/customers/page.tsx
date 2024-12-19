@@ -3,13 +3,14 @@ import { CustomerList } from "@/components/admin/CustomerList"
 import AdminSidebar from "@/components/admin/AdminSidebar"
 
 interface CustomersPageProps {
-  searchParams: { page?: string; phone?: string }
+  searchParams: Promise<{ page?: string; phone?: string }>
 }
 
 export default async function CustomersPage({ searchParams }: CustomersPageProps) {
-  const currentPage = Number(searchParams.page) || 1
+  const {page , phone} = await searchParams;
+  const currentPage = Number(page) || 1
   const limit = 10
-  const { customers, total } = await getCustomers(currentPage, limit, searchParams.phone)
+  const { customers, total } = await getCustomers(currentPage, limit, phone)
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -20,7 +21,7 @@ export default async function CustomersPage({ searchParams }: CustomersPageProps
             customers={customers} 
             total={total} 
             currentPage={currentPage} 
-            phoneSearch={searchParams.phone || ""}
+            phoneSearch={phone || ""}
           />
         </div>
       </div>

@@ -8,13 +8,14 @@ import Link from "next/link"
 import { Pagination } from "@/components/ui/pagination"
 
 interface ProductsPageProps {
-  searchParams: { page?: string; sku?: string }
+  searchParams: Promise<{ page?: string; sku?: string }>
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
-  const currentPage = Number(searchParams.page) || 1
+  const {page,sku} = await searchParams;
+  const currentPage = Number(page) || 1
   const limit = 9
-  const { products, total } = await getProducts(currentPage, limit, undefined, searchParams.sku)
+  const { products, total } = await getProducts(currentPage, limit, undefined, sku)
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -31,7 +32,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                     name="sku"
                     placeholder="Search by SKU..." 
                     className="pl-10 w-[300px]"
-                    defaultValue={searchParams.sku}
+                    defaultValue={sku}
                   />
                   <input type="hidden" name="page" value="1" />
                   <Button type="submit" className="ml-2">
@@ -52,7 +53,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             <Pagination 
               currentPage={currentPage} 
               totalPages={Math.ceil(total / limit)}
-              searchParams={searchParams}
+              searchParams={await searchParams}
             />
           </div>
         </div>

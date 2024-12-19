@@ -4,13 +4,14 @@ import AdminSidebar from "@/components/admin/AdminSidebar"
 import { notFound } from "next/navigation"
 
 interface CustomerDetailPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function CustomerDetailPage({ params }: CustomerDetailPageProps) {
-  const customer = await getCustomerById(params.id)
+  const {id} = await params;
+  const customer = await getCustomerById(id)
 
   if (!customer) {
     notFound()

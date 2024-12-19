@@ -14,13 +14,14 @@ import { getOrders } from "@/lib/orders"
 import { Pagination } from "@/components/ui/pagination"
 
 interface OrdersPageProps {
-  searchParams: { page?: string }
+  searchParams: Promise<{ page?: string }>
 }
 
 export default async function OrdersPage({ searchParams }: OrdersPageProps) {
-  const currentPage = Number(searchParams.page) || 1
-  const limit = 10
-  const { orders, total } = await getOrders(currentPage, limit)
+  const {page} = await searchParams;
+  const currentPage = Number(page) || 1;
+  const limit = 10;
+  const { orders, total } = await getOrders()
 
   return (
     <div className="flex min-h-screen bg-gray-100">

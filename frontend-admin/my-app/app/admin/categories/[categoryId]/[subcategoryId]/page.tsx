@@ -5,28 +5,34 @@ import { ProductList } from "@/components/admin/ProductList"
 import { notFound } from "next/navigation"
 
 interface SubcategoryProductsPageProps {
-  params: {
+  params: Promise<{
     categoryId: string
     subcategoryId: string
-  }
-  searchParams: { page?: string; sku?: string }
+  }>
+  searchParams: Promise<{ 
+    page?: string
+    sku?: string 
+  }>
 }
 
 export default async function SubcategoryProductsPage({ params, searchParams }: SubcategoryProductsPageProps) {
-  const category = await getCategoryById(params.categoryId)
+  const { categoryId, subcategoryId } = await params
+  const { page, sku } = await searchParams
+  const category = await getCategoryById(categoryId)
 
   if (!category) {
     notFound()
   }
-  console.log(category)
-  const subcategory = category.subCategories.find(sc => sc.id == params.subcategoryId)
-  // if (!subcategory) {
-  //   notFound()
-  // }
 
-  const currentPage = Number(searchParams.page) || 1
+  const subcategory = category.subCategories.find(sc => sc.id === subcategoryId)
+
+  if (!subcategory) {
+    notFound()
+  }
+
+  const currentPage = Number(page) || 1
   const limit = 10
-  const { products, total } = await getProducts(currentPage, limit, params.subcategoryId, searchParams.sku)
+  const { products, total } = await getProducts(currentPage, limit, subcategoryId, sku)
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -38,8 +44,8 @@ export default async function SubcategoryProductsPage({ params, searchParams }: 
             products={products} 
             total={total} 
             currentPage={currentPage} 
-            subcategoryId={params.subcategoryId}
-            categoryId={params.categoryId}
+            subcategoryId={subcategoryId}
+            categoryId={categoryId}
             subcategoryName={subcategory.name}
             hasProducts={products.length > 0}
           />

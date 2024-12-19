@@ -4,14 +4,15 @@ import AdminSidebar from "@/components/admin/AdminSidebar"
 import { notFound } from "next/navigation"
 
 interface ProductPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const isNewProduct = params.id === 'new'
-  const product = isNewProduct ? null : await getProductById(params.id)
+  const {id} = await params;
+  const isNewProduct = id === 'new'
+  const product = isNewProduct ? null : await getProductById(id)
 
   if (!isNewProduct && !product) {
     notFound()

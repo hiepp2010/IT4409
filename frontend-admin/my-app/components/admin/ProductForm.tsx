@@ -29,7 +29,7 @@ function convertGoogleDriveUrl(url: string): string {
 }
 
 interface ProductFormProps {
-  initialData: Product | null
+  initialData?: Product | null
   isNewProduct: boolean
 }
 
@@ -44,6 +44,7 @@ const emptyProduct: Product = {
   discountedPrice: 0,
   colors: [],
   categoryId: "",
+  tags: []
 }
 
 const API_URL=process.env.NEXT_PUBLIC_API_URL;

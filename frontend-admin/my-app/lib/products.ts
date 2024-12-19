@@ -90,7 +90,7 @@ export async function getProductById(id: string): Promise<Product | null> {
   };
 }
 
-export async function createProduct(product: Omit<Product, 'id'>): Promise<Product> {
+export async function createProduct(product: Omit<Product, 'id'>): Promise<Product | null> {
   const response = await fetch(`${API_URL}/products`, {
     method: 'POST',
     headers: {
@@ -108,7 +108,7 @@ export async function createProduct(product: Omit<Product, 'id'>): Promise<Produ
   return getProductById((await response.json()).id);
 }
 
-export async function updateProduct(id: string, product: Partial<Product>): Promise<Product> {
+export async function updateProduct(id: string, product: Partial<Product>): Promise<Product | null> {
   const response = await fetch(`${API_URL}/products/${id}`, {
     method: 'PUT',
     headers: {
