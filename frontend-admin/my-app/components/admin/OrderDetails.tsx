@@ -2,7 +2,6 @@
 
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -120,10 +119,10 @@ export function OrderDetails({ order }: OrderDetailsProps) {
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-red-500 rounded" />
-            {/* <span>Mastercard **** **** **** {order.paymentInfo.last4}</span> */}
+            <span>Mastercard **** **** **** {order.paymentInfo.last4}</span>
           </div>
-          {/* <p className="text-sm text-gray-500">Business name: {order.paymentInfo.businessName}</p> */}
-          {/* <p className="text-sm text-gray-500">Phone: {order.paymentInfo.phone}</p> */}
+          <p className="text-sm text-gray-500">Business name: {order.paymentInfo.businessName}</p>
+          <p className="text-sm text-gray-500">Phone: {order.paymentInfo.phone}</p>
         </div>
       </Card>
 
@@ -148,7 +147,7 @@ export function OrderDetails({ order }: OrderDetailsProps) {
               <TableHead className="text-right">Total</TableHead>
             </TableRow>
           </TableHeader>
-          {/* <TableBody>
+          <TableBody>
             {order.products.map((product: any) => (
               <TableRow key={product.id}>
                 <TableCell>
@@ -167,7 +166,7 @@ export function OrderDetails({ order }: OrderDetailsProps) {
                 <TableCell className="text-right">₹{product.total.toFixed(2)}</TableCell>
               </TableRow>
             ))}
-          </TableBody> */}
+          </TableBody>
         </Table>
 
         <div className="mt-6 space-y-2">

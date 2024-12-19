@@ -15,7 +15,7 @@ export function Pagination({ currentPage, totalPages, searchParams = {} }: Pagin
   const halfVisiblePages = Math.floor(maxVisiblePages / 2)
 
   let startPage = Math.max(currentPage - halfVisiblePages, 1)
-  let endPage = Math.min(startPage + maxVisiblePages - 1, totalPages)
+  const endPage = Math.min(startPage + maxVisiblePages - 1, totalPages)
 
   if (endPage - startPage + 1 < maxVisiblePages) {
     startPage = Math.max(endPage - maxVisiblePages + 1, 1)

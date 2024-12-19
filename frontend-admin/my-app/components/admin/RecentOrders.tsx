@@ -14,8 +14,6 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { Order, getOrders } from "@/lib/orders"
 
-const ITEMS_PER_PAGE = 6
-
 export function RecentOrders() {
   const [selectedOrders, setSelectedOrders] = useState<string[]>([])
   const [orders, setOrders] = useState<Order[]>([])

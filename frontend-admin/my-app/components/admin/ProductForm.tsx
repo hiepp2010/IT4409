@@ -15,8 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Product, Color, Size, createProduct, updateProduct, deleteProduct } from "@/lib/products"
+import { Product, Color } from "@/lib/products"
 import { SubCategory, getCategories } from "@/lib/categories"
 import { toast } from "@/hooks/use-toast"
 
@@ -47,7 +46,7 @@ const emptyProduct: Product = {
   categoryId: "",
 }
 
-const API_URL=process.env.API_URL;
+const API_URL=process.env.NEXT_PUBLIC_API_URL;
 
 export default function ProductForm({ initialData, isNewProduct }: ProductFormProps) {
   const router = useRouter()
@@ -123,7 +122,6 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
       const newColor: Color = {
         name: newColorName.trim(),
         sizes: [],
-        images: [],
         imagePaths: []
       }
       setFormData((prev) => ({
@@ -222,7 +220,7 @@ export default function ProductForm({ initialData, isNewProduct }: ProductFormPr
     try {
       let savedProduct: Product
       if (isNewProduct) {
-        const response = await fetch('http://localhost:3100/products', {
+        const response = await fetch(`${API_URL}/products`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -21,7 +21,7 @@ interface ProductListProps {
   hasProducts: boolean
 }
 
-export function ProductList({ products, total, currentPage, subcategoryName, categoryId, subcategoryId, hasProducts }: ProductListProps) {
+export function ProductList({ products, total, currentPage, categoryId, subcategoryId, hasProducts }: ProductListProps) {
   const [skuSearch, setSkuSearch] = useState("")
   const router = useRouter()
 

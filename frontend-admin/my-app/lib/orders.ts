@@ -30,9 +30,9 @@ export interface Order {
   };
 }
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function getOrders(page: number = 1, limit: number = 10): Promise<{ orders: Order[], total: number }> {
+export async function getOrders(): Promise<{ orders: Order[], total: number }> {
   const response = await fetch(`${API_URL}/all`);
   if (!response.ok) {
     throw new Error('Failed to fetch orders');

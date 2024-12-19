@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Customer, CustomerOrder } from "@/lib/customers"
+import { Customer } from "@/lib/customers"
 import { Card } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
