@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label"
 import { toast } from "@/hooks/use-toast"
 import Link from 'next/link'
 
+const API_URL=process.env.API_URL;
+
 export default function AuthPage() {
   const router = useRouter()
   const [isLogin, setIsLogin] = useState(true)
@@ -24,7 +26,7 @@ export default function AuthPage() {
 
     try {
       const endpoint = isLogin ? '/login' : '/signup'
-      const response = await fetch(`http://localhost:3100/auth${endpoint}`, {
+      const response = await fetch(`${API_URL}/auth${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -38,6 +38,8 @@ interface ShippingInfo {
   notes: string;
 }
 
+const API_URL = process.env.API_URL;
+
 export default function CheckoutPage() {
   const router = useRouter()
   const { items, clearCart } = useCart()
