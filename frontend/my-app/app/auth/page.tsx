@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "@/hooks/use-toast"
-import Link from 'next/link'
 
-const API_URL=process.env.API_URL;
+
+const API_URL=process.env.NEXT_PUBLIC_API_URL;
 
 export default function AuthPage() {
   const router = useRouter()

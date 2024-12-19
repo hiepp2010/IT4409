@@ -17,6 +17,8 @@ interface UserProfile {
   address: string;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function ProfilePage() {
   const router = useRouter()
   const [profile, setProfile] = useState<UserProfile>({
@@ -37,7 +39,7 @@ export default function ProfilePage() {
       }
 
       try {
-        const response = await fetch(`http://localhost:3100/api/users/${userId}`)
+        const response = await fetch(`${API_URL}/users/${userId}`)
         if (!response.ok) {
           throw new Error('Failed to fetch user profile')
         }
@@ -73,7 +75,7 @@ export default function ProfilePage() {
     }
 
     try {
-      const response = await fetch(`http://localhost:3100/api/users/${userId}`, {
+      const response = await fetch(`${API_URL}/users/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

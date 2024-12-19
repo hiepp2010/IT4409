@@ -5,8 +5,10 @@ import Pagination from '@/components/clients/Pagination'
 
 const ITEMS_PER_PAGE = 20
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 async function getSubcategoryData(subcategoryId: string) {
-  const response = await fetch(`http://localhost:3100/subcategories/${subcategoryId}`);
+  const response = await fetch(`${API_URL}/subcategories/${subcategoryId}`);
   if (!response.ok) {
     if (response.status === 404) {
       return null;
@@ -20,17 +22,18 @@ export default async function SubcategoryPage({
   params, 
   searchParams 
 }: { 
-  params: { subcategoryId: string },
-  searchParams: { page?: string }
+  params: Promise<{ subcategoryId: string }>,
+  searchParams: Promise<{ page?: string }>
 }) {
-  const page = Number(searchParams.page) || 1;
-  const subcategory = await getSubcategoryData(params.subcategoryId);
+  const {subcategoryId} = await params;
+  const page = Number((await searchParams).page) || 1;
+  const subcategory = await getSubcategoryData(subcategoryId);
 
   if (!subcategory) {
     notFound();
   }
 
-  const { products, total } = await getProducts(page, ITEMS_PER_PAGE, params.subcategoryId);
+  const { products, total } = await getProducts(page, ITEMS_PER_PAGE, subcategoryId);
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
   return (

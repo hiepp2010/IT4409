@@ -13,6 +13,8 @@ interface Order {
   status: string;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function OrderHistoryPage() {
   const router = useRouter()
   const [orders, setOrders] = useState<Order[]>([])
@@ -27,7 +29,7 @@ export default function OrderHistoryPage() {
       }
 
       try {
-        const response = await fetch(`http://localhost:3100/user/${userId}`)
+        const response = await fetch(`${API_URL}/user/${userId}`)
         if (!response.ok) {
           throw new Error('Failed to fetch orders')
         }

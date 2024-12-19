@@ -2,27 +2,27 @@
 
 import {use} from 'react'
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { ChevronLeft, ChevronRight, Truck, ArrowLeftRight, Shield } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import Footer from '@/components/clients/footer'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
+// import Image from 'next/image'
+// import Link from 'next/link'
+// import { ChevronLeft, ChevronRight, Truck, ArrowLeftRight, Shield } from 'lucide-react'
+// import { Button } from "@/components/ui/button"
+// import Footer from '@/components/clients/footer'
+// import {
+//   Accordion,
+//   AccordionContent,
+//   AccordionItem,
+//   AccordionTrigger,
+// } from "@/components/ui/accordion"
 
 import { getProductById, Product, Color, Size } from '@/lib/product'
 import { useCart } from '@/app/contexts/CartContext'
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+// import { 
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 
 type ProductPageProps = Promise<{
@@ -44,7 +44,7 @@ export default  function ProductPage(props: { params: ProductPageProps }) {
       const fetchedProduct = await getProductById(id)
       if (fetchedProduct) {
         setProduct(fetchedProduct)
-        setSelectedColor(fetchedProduct.color[0])
+        setSelectedColor(fetchedProduct.colors[0])
       }
     }
     fetchProduct()
@@ -61,34 +61,34 @@ export default  function ProductPage(props: { params: ProductPageProps }) {
     return <div>Loading...</div>
   }
 
-  const handleColorChange = (colorId: string) => {
-    const newColor = product.color.find(c => c.id === colorId)
-    if (newColor) {
-      setSelectedColor(newColor)
-    }
-  }
+  // const handleColorChange = (colorId: string) => {
+  //   const newColor = product.colors.find(c => c.id === colorId)
+  //   if (newColor) {
+  //     setSelectedColor(newColor)
+  //   }
+  // }
 
-  const handleSizeChange = (size: string) => {
-    const newSize = selectedColor.size.find(s => s.size === size)
-    if (newSize) {
-      setSelectedSize(newSize)
-    }
-  }
+  // const handleSizeChange = (size: string) => {
+  //   const newSize = selectedColor.sizes.find(s => s.size === size)
+  //   if (newSize) {
+  //     setSelectedSize(newSize)
+  //   }
+  // }
 
-  const handleAddToCart = () => {
-    if (product && selectedColor && selectedSize) {
-      addItem(product, selectedColor.id, selectedSize.size)
-      toast({
-        title: "Thêm vào giỏ hàng thành công",
-        description: `${product.name} - ${selectedColor.color_name}, Size ${selectedSize.size}`,
-      })
-    }
-  }
+  // const handleAddToCart = () => {
+  //   if (product && selectedColor && selectedSize) {
+  //     addItem(product, selectedColor.id, selectedSize.size)
+  //     toast({
+  //       title: "Thêm vào giỏ hàng thành công",
+  //       description: `${product.name} - ${selectedColor.color_name}, Size ${selectedSize.size}`,
+  //     })
+  //   }
+  // }
 
   return (
     <div className="flex flex-col min-h-screen">
 
-      <main className="flex-grow">
+      {/* <main className="flex-grow">
         <div className="container mx-auto px-4 py-8">
           <nav className="text-sm mb-8">
             <Link href="/" className="text-gray-500 hover:text-gray-700">Trang chủ</Link>
@@ -221,7 +221,7 @@ export default  function ProductPage(props: { params: ProductPageProps }) {
           </div>
         </div>
       </main>
-      <Footer />
+      <Footer /> */}
     </div>
   )
 }

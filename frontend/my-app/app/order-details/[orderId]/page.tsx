@@ -44,7 +44,10 @@ interface Order {
   total: number;
 }
 
-export default function OrderDetailsPage({ params }: { params: { orderId: string } }) {
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+export default async function OrderDetailsPage({ params }: { params: Promise<{ orderId: string }> }) {
+  const {orderId} = await params;
   const router = useRouter()
   const [order, setOrder] = useState<Order | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -59,7 +62,7 @@ export default function OrderDetailsPage({ params }: { params: { orderId: string
           return
         }
 
-        const response = await fetch(`http://localhost:3100/order/${params.orderId}`, {
+        const response = await fetch(`${API_URL}/order/${orderId}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
@@ -84,7 +87,7 @@ export default function OrderDetailsPage({ params }: { params: { orderId: string
     }
 
     fetchOrderDetails()
-  }, [params.orderId, router])
+  }, [orderId, router])
 
   if (isLoading) {
     return (

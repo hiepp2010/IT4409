@@ -8,8 +8,9 @@ function getCategoryData(slug: string) {
   return categories[slug as keyof typeof categories]
 }
 
-export default function CategoryPage({ params }: { params: { slug: string } }) {
-  const category = getCategoryData(params.slug)
+export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+  const {slug} = await params;
+  const category = getCategoryData(slug)
 
   if (!category) {
     notFound()

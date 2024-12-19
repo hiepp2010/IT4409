@@ -38,7 +38,7 @@ interface ShippingInfo {
   notes: string;
 }
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -68,7 +68,7 @@ export default function CheckoutPage() {
 
   const fetchUserInfo = async (userId: string) => {
     try {
-      const response = await fetch(`http://localhost:3100/users/${userId}`)
+      const response = await fetch(`${API_URL}/users/${userId}`)
       if (!response.ok) {
         throw new Error('Failed to fetch user info')
       }
@@ -141,7 +141,7 @@ export default function CheckoutPage() {
       }
 
       // Send order to API
-      const response = await fetch('http://localhost:3100/create-order', { // Updated API endpoint
+      const response = await fetch(`${API_URL}/create-order`, { // Updated API endpoint
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

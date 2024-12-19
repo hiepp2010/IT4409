@@ -27,6 +27,8 @@ interface SubCategory {
   name: string;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function NavBar() {
   const router = useRouter()
   const { getCartCount } = useCart()
@@ -43,7 +45,7 @@ export default function NavBar() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://localhost:3100/categories')
+        const response = await fetch(`${API_URL}/categories`)
         if (!response.ok) {
           throw new Error('Failed to fetch categories')
         }

@@ -23,7 +23,7 @@ export interface Product {
   colors: Color[];
 }
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function getProducts(page: number = 1, limit: number = 20, subcategoryId?: string): Promise<{ products: Product[], total: number }> {
   let url = `${API_URL}/products?page=${page}&limit=${limit}`;
