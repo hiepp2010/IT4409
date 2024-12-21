@@ -109,7 +109,6 @@ const createOrder = async (req, res) => {
     total_amount += price * quantity;
     total_discount += discount_amount ? discount_amount * quantity : 0;
   });
-
   // Start a transaction
   // const transaction = await sequelize.transaction();
 
@@ -141,7 +140,7 @@ const createOrder = async (req, res) => {
     if (orderData.paymentMethod === "vnpay") {
       const paymentUrl = await paymentWithVnpay({
         total_amount,
-        user_id,
+        userId,
         ipAddr,
       });
       res.status(200).json({ paymentUrl: paymentUrl });
