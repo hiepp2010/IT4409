@@ -363,7 +363,7 @@ OrderItem.belongsTo(Color, { foreignKey: "colorId", as: "color" });
     await sequelize.authenticate();
     // eslint-disable-next-line no-console
     console.log("Connection has been established successfully.");
-    await sequelize.sync({ force: true }); // Force sync for demonstration, should be used cautiously
+    await sequelize.sync({ force: false }); // Force sync for demonstration, should be used cautiously
     // eslint-disable-next-line no-console
     console.log("Database synchronized with models");
   } catch (error) {
