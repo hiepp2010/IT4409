@@ -287,6 +287,36 @@ const OrderItem = sequelize.define(
   { timestamps: false }
 );
 
+const Message = sequelize.define(
+  "Message",
+  {
+    id: {
+      type: DataTypes.BIGINT,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    senderId: {
+      type: DataTypes.BIGINT,
+      references: {
+        model: User,
+        key: "id",
+      },
+    },
+    receiverId: {
+      type: DataTypes.BIGINT,
+      references: {
+        model: User,
+        key: "id",
+      },
+    },
+    message: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  },
+  { timestamps: true }
+);
+
 // Establish relationships
 Category.hasMany(SubCategory, {
   foreignKey: "categoryId",
@@ -331,8 +361,10 @@ OrderItem.belongsTo(Color, { foreignKey: "colorId", as: "color" });
 (async () => {
   try {
     await sequelize.authenticate();
+    // eslint-disable-next-line no-console
     console.log("Connection has been established successfully.");
     await sequelize.sync({ force: true }); // Force sync for demonstration, should be used cautiously
+    // eslint-disable-next-line no-console
     console.log("Database synchronized with models");
   } catch (error) {
     console.error("Unable to connect to the database:", error);
@@ -351,6 +383,7 @@ module.exports = {
   OrderHistory,
   OrderItem,
   sequelize,
+  Message,
 };
-
+// eslint-disable-next-line no-console
 console.log("Sequelize configuration updated successfully.");

@@ -8,7 +8,7 @@ const authRoutes = require("./routes/authRoutes");
 const helmet = require("helmet");
 const xss = require("xss-clean");
 const cors = require("cors");
-
+const { Message } = require("./models/model");
 const app = express();
 const server = http.createServer(app);
 const socketIo = require("socket.io")(server, {
@@ -31,23 +31,21 @@ app.use("/auth", authRoutes);
 app.use("/", orderRoutes);
 
 const customers = {}; // Track connected customers by their socket ID
-
+let adminId;
 socketIo.on("connection", (socket) => {
-
   // Join customers or admin
   socket.on("join", ({ role, userId }) => {
     if (role === "admin") {
       socket.join("admins"); // Admins join a specific room
-      console.log("Admin connected:", userId);
+      adminId = userId;
     } else {
       customers[socket.id] = { userId }; // Track customers
       socket.join("customers"); // Customers join a specific room
-      console.log("Customer connected:", userId);
     }
   });
 
   // Admin sending message to a specific customer
-  socket.on("sendMessageToCustomer", ({ customerId, message }) => {
+  socket.on("sendMessageToCustomer", async ({ customerId, message }) => {
     const customerSocketId = Object.keys(customers).find(
       (key) => customers[key].userId === customerId
     );
@@ -55,28 +53,35 @@ socketIo.on("connection", (socket) => {
       socketIo
         .to(customerSocketId)
         .emit("receiveMessage", { from: "admin", message });
-      console.log(`Message sent to customer ${customerId}: ${message}`);
+      await Message.create({
+        senderId: adminId,
+        receiverId: customerId,
+        message,
+      });
     } else {
+      // eslint-disable-next-line no-console
       console.log(`Customer ${customerId} not found.`);
     }
   });
 
   // Customer sending message to the admin
-  socket.on("sendMessageToAdmin", ({ message }) => {
+  socket.on("sendMessageToAdmin", async ({ customerId, message }) => {
     socketIo
       .to("admins")
       .emit("receiveMessage", { from: customers[socket.id]?.userId, message });
-    console.log(
-      `Message from customer ${customers[socket.id]?.userId}: ${message}`
-    );
+    await Message.create({
+      senderId: customerId,
+      receiverId: adminId,
+      message,
+    });
   });
 
   // Handle disconnection
   socket.on("disconnect", () => {
     if (customers[socket.id]) {
-      console.log(`Customer disconnected: ${customers[socket.id].userId}`);
       delete customers[socket.id];
     } else {
+      // eslint-disable-next-line no-console
       console.log(`Admin disconnected: ${socket.id}`);
     }
   });
@@ -85,5 +90,6 @@ socketIo.on("connection", (socket) => {
 // Start the server
 const PORT = 3100;
 server.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`Server is running on port ${PORT}`);
 });
