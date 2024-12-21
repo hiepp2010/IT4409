@@ -4,12 +4,6 @@ const moment = require("moment");
 const querystring = require("qs");
 const crypto = require("crypto");
 
-const sequelize = new Sequelize('backend', 'root', '1234abcd', {
-  host: 'localhost',
-  port: 3307,
-  dialect: 'mysql'
-});
-
 const _sortObject = (obj) => {
   let sorted = {};
   let keys = Object.keys(obj).sort(); // Get and sort keys alphabetically
@@ -19,12 +13,12 @@ const _sortObject = (obj) => {
   return sorted;
 };
 
-const paymentWithVnpay = async ({ total_amount, customer_id, ipAddr }) => {
+const paymentWithVnpay = async ({ total_amount, ipAddr }) => {
   try {
     const tmnCode = "N9ZU3Q90"; // Replace with your actual TMN code
     const secretKey = "G15YSOY3R1T0O7LNCPUXY9K6D1KEF48K"; // Replace with your actual secret key
-    const vnpUrl = "https://sandbox.vnpayment.vn/pa ymentv2/vpcpay.html";
-    const returnUrl = "localhost:3000";
+    const vnpUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+    const returnUrl = "https://it-4409-client.vercel.app/checkout";
 
     // Generate timestamps
     const date = moment();
@@ -32,7 +26,7 @@ const paymentWithVnpay = async ({ total_amount, customer_id, ipAddr }) => {
     const orderId = date.format("HHmmss");
     const expireDate = moment().add(6, "hours").format("YYYYMMDDHHmmss");
     const amount = total_amount; // Assuming total_amount is in VND
-    const orderInfo = "Thanhtoanchokhachhang${customer_id}giatri${total_amount}";
+    const orderInfo = "Thanhtoanchokhachhang";
     const orderType = "200000"; // mặt hàng thời trang
     const locale = "vn"; // Locale (e.g., "vn" for Vietnamese)
     const currCode = "VND"; // Currency code
@@ -59,8 +53,6 @@ const paymentWithVnpay = async ({ total_amount, customer_id, ipAddr }) => {
     const hmac = crypto.createHmac("sha512", secretKey);
     const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
     vnp_Params["vnp_SecureHash"] = signed;
-
-    // Sort parameters and create query string
 
     const paymentUrl = `${vnpUrl}?${querystring.stringify(vnp_Params, {
       encode: false,
