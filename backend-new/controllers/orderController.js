@@ -16,7 +16,7 @@ const _sortObject = (obj) => {
 const paymentWithVnpay = async ({ total_amount, ipAddr }) => {
   try {
     const tmnCode = "N9ZU3Q90"; // Replace with your actual TMN code
-    const secretKey = "G15YSOY3R1T0O7LNCPUXY9K6D1KEF48K"; // Replace with your actual secret key
+    const secretKey = "DCF11SO65KKGFSJ6GQLP31M2UYQSIOOG"; // Replace with your actual secret key
     const vnpUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     const returnUrl = "https://it-4409-client.vercel.app/checkout";
 
