@@ -38,7 +38,7 @@ export default function ChatWindow({ onClose }: ChatWindowProps) {
       if (!userId) return
 
       try {
-        const response = await fetch(`http://localhost:3100/messages?userId=${userId}`, {
+        const response = await fetch(`https://maixuanhieu20215576-web.onrender.com/messages?userId=${userId}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
@@ -68,7 +68,7 @@ export default function ChatWindow({ onClose }: ChatWindowProps) {
   useEffect(() => {
     if (!userId) return
 
-    const socketInstance = io('http://localhost:3100', {
+    const socketInstance = io('https://maixuanhieu20215576-web.onrender.com', {
       transports: ['websocket'],
       auth: {
         token: localStorage.getItem('token')
