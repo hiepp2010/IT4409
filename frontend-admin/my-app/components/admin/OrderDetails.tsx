@@ -114,17 +114,6 @@ export function OrderDetails({ order }: OrderDetailsProps) {
         </Card>
       </div>
 
-      <Card className="p-6">
-        <h3 className="font-semibold mb-4">Payment Info</h3>
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-red-500 rounded" />
-            <span>Mastercard **** **** **** {order.paymentInfo.last4}</span>
-          </div>
-          <p className="text-sm text-gray-500">Business name: {order.paymentInfo.businessName}</p>
-          <p className="text-sm text-gray-500">Phone: {order.paymentInfo.phone}</p>
-        </div>
-      </Card>
 
       <Card className="p-6">
         <h3 className="font-semibold mb-4">Note</h3>
@@ -148,7 +137,7 @@ export function OrderDetails({ order }: OrderDetailsProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {order.products.map((product: any) => (
+            {order.products?.map((product: any) => (
               <TableRow key={product.id}>
                 <TableCell>
                   <div className="w-10 h-10 relative">

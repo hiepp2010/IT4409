@@ -92,7 +92,7 @@ export function RecentOrders() {
                 {order.status}
               </Badge>
             </TableCell>
-            <TableCell className="text-right">${order.totalAmount.toFixed(2)}</TableCell>
+            <TableCell className="text-right">${order.totalAmount}</TableCell>
           </TableRow>
         ))}
       </TableBody>
