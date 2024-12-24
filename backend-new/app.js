@@ -5,6 +5,7 @@ const categoryRoutes = require("./routes/categoryRoutes");
 const subcategoryRoutes = require("./routes/subcategoryRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const authRoutes = require("./routes/authRoutes");
+const messageRoutes = require("./routes/messageRoute")
 const helmet = require("helmet");
 const xss = require("xss-clean");
 const cors = require("cors");
@@ -29,6 +30,7 @@ app.use("/categories", categoryRoutes);
 app.use("/subcategories", subcategoryRoutes);
 app.use("/auth", authRoutes);
 app.use("/", orderRoutes);
+app.use("/messages",messageRoutes)
 
 const customers = {}; // Track connected customers by their socket ID
 let adminId;

@@ -14,6 +14,7 @@ const navigation = [
   { name: 'Orders List', href: '/admin/orders', icon: ShoppingCart },
   { name: 'Customers', href: '/admin/customers', icon: Users },
   { name: 'Categories', href: '/admin/categories', icon: FolderTree },
+  { name: 'Chat', href: '/admin/chat', icon: FolderTree },
 ]
 
 export default function AdminSidebar() {
