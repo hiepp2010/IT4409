@@ -333,7 +333,7 @@ export default function CheckoutPage() {
                       <RadioGroupItem value="cod" id="cod" />
                       <Label htmlFor="cod" className="flex items-center gap-2">
                         <Image
-                          src="/placeholder.svg"
+                          src="https://io.meeymedia.com/meeyland-cms/uploads/images/2022/07/30/cod3-1659191255.jpeg"
                           alt="COD"
                           width={32}
                           height={32}
@@ -345,7 +345,7 @@ export default function CheckoutPage() {
                       <RadioGroupItem value="vnpay" id="vnpay" />
                       <Label htmlFor="vnpay" className="flex items-center gap-2">
                         <Image
-                          src="/placeholder.svg"
+                          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuJIqHjspU1PUBlnPrexU79_kNkzH0MuV4jw&s"
                           alt="VNPAY"
                           width={32}
                           height={32}
@@ -388,16 +388,16 @@ export default function CheckoutPage() {
                 <Separator />
                 <div className="flex justify-between">
                   <span>Tạm tính:</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>₫{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Phí vận chuyển:</span>
-                  <span>{shipping === 0 ? 'Miễn phí' : `$${shipping}`}</span>
+                  <span>{shipping === 0 ? 'Miễn phí' : `₫${shipping}`}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between text-lg font-bold">
                   <span>Tổng cộng:</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>₫{total.toFixed(2)}</span>
                 </div>
               </div>
             </CardContent>

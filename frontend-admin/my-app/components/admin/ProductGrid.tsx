@@ -43,16 +43,11 @@ export default function ProductGrid({ products }: ProductGridProps) {
                     />
                   </div>
                   <div>
-                    <p className="text-sm font-medium mt-1"> 
-                      {
-                        product.colors[0]?.imagePaths[0]
-                      }
-                    </p>
                     <h3 className="font-medium">{product.name}</h3>
                     <p className="text-sm text-gray-500">{product.subcategoryId}</p>
                     <p className="text-sm font-medium mt-1">
                       {typeof product.price === 'number' 
-                        ? `₹${product.price.toFixed(2)}` 
+                        ? `₫${product.price.toFixed(2)}` 
                         : 'Price not available'}
                     </p>
                   </div>
@@ -75,9 +70,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
               </div>
 
               <div className="mt-6">
-               <p className="text-sm text-gray-500 mb-6">
-                    {product.colors[0]?.imagePaths[0]}
-                </p>
+              
                 <h4 className="text-sm font-medium mb-4">Summary</h4>
                 <p className="text-sm text-gray-500 mb-6">
                   {product.colors?.length || 0} color(s), 
@@ -90,7 +83,6 @@ export default function ProductGrid({ products }: ProductGridProps) {
                       <span>Total Stock</span>
                       <span>{totalStock}</span>
                     </div>
-                    <Progress value={totalStock} max={1000} className="h-1" />
                   </div>
                 </div>
               </div>

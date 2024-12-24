@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { LayoutDashboard, Package, ShoppingCart, Users, LogOut, FolderTree } from 'lucide-react'
+import { MessageSquare } from "lucide-react"
 import Image from "next/image"
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
@@ -14,7 +15,7 @@ const navigation = [
   { name: 'Orders List', href: '/admin/orders', icon: ShoppingCart },
   { name: 'Customers', href: '/admin/customers', icon: Users },
   { name: 'Categories', href: '/admin/categories', icon: FolderTree },
-  { name: 'Chat', href: '/admin/chat', icon: FolderTree },
+  { name: 'Chat', href: '/admin/chat', icon: MessageSquare },
 ]
 
 export default function AdminSidebar() {
@@ -25,7 +26,7 @@ export default function AdminSidebar() {
     <div className="w-64 min-h-screen bg-white border-r flex flex-col">
       <div className="p-6 flex-grow">
         <Image
-          src="/placeholder.svg"
+          src="https://cdn-icons-png.flaticon.com/512/560/560199.png"
           alt="Logo"
           width={120}
           height={40}

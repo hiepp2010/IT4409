@@ -4,21 +4,21 @@ const bestSellers = [
   {
     id: 1,
     name: "Lorem ipsum",
-    price: "₹126.50",
+    price: "₫126.50",
     sales: "999 sales",
     image: "/placeholder.svg"
   },
   {
     id: 2,
     name: "Lorem ipsum",
-    price: "₹126.50",
+    price: "₫126.50",
     sales: "999 sales",
     image: "/placeholder.svg"
   },
   {
     id: 3,
     name: "Lorem ipsum",
-    price: "₹126.50",
+    price: "₫126.50",
     sales: "999 sales",
     image: "/placeholder.svg"
   }

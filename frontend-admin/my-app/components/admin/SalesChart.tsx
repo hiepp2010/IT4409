@@ -24,11 +24,11 @@ ChartJS.register(
 
 export function SalesChart() {
   const data = {
-    labels: ['JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
+    labels: [ 'SEP', 'OCT', 'NOV', 'DEC'],
     datasets: [
       {
         label: 'Sales',
-        data: [100, 120, 150, 200, 250, 300],
+        data: [100, 120, 150, 200],
         borderColor: 'rgb(59, 130, 246)',
         backgroundColor: 'rgba(59, 130, 246, 0.5)',
         tension: 0.4,
@@ -51,7 +51,7 @@ export function SalesChart() {
           color: 'rgba(0, 0, 0, 0.1)',
         },
         ticks: {
-          callback: (value: any) => `₹${value}`,
+          callback: (value: any) => `₫${value}`,
         },
       },
       x: {

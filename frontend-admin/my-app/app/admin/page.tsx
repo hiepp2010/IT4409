@@ -21,36 +21,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <MetricCard
-            title="Total Orders"
-            value="₹126,500"
-            change={34.7}
-            icon={<ShoppingCart className="h-5 w-5" />}
-            description="Compared to Oct 2023"
-          />
-          <MetricCard
-            title="Active Orders"
-            value="₹126,500"
-            change={34.7}
-            icon={<Package2 className="h-5 w-5" />}
-            description="Compared to Oct 2023"
-          />
-          <MetricCard
-            title="Completed Orders"
-            value="₹126,500"
-            change={34.7}
-            icon={<CheckCircle className="h-5 w-5" />}
-            description="Compared to Oct 2023"
-          />
-          <MetricCard
-            title="Return Orders"
-            value="₹126,500"
-            change={34.7}
-            icon={<RotateCcw className="h-5 w-5" />}
-            description="Compared to Oct 2023"
-          />
-        </div>
+        
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2">
@@ -66,14 +37,7 @@ export default function AdminDashboard() {
               <SalesChart />
             </Card>
           </div>
-          <div>
-            <Card className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-semibold">Best Sellers</h2>
-              </div>
-              <BestSellers />
-            </Card>
-          </div>
+          
         </div>
 
         <Card className="p-6">

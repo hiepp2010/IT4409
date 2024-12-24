@@ -26,6 +26,7 @@ interface MessageListProps {
 
 export function MessageList({ messages, users, currentUserId }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const ADMIN_ID = '1' // Define admin ID constant
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -39,7 +40,8 @@ export function MessageList({ messages, users, currentUserId }: MessageListProps
     <ScrollArea className="flex-1 p-4" ref={scrollRef}>
       <div className="space-y-4">
         {messages.map((message) => {
-          const isCurrentUser = message.senderId === currentUserId
+          // Check if the message is from Customer 1 (admin) regardless of whether they're sender or receiver
+          const isAdminMessage = message.senderId == ADMIN_ID || message.receiverId == ADMIN_ID
           const sender = getUserById(message.senderId)
 
           return (
@@ -47,21 +49,25 @@ export function MessageList({ messages, users, currentUserId }: MessageListProps
               key={message.id}
               className={cn(
                 "flex items-start gap-3",
-                isCurrentUser && "flex-row-reverse"
+                message.senderId == ADMIN_ID && "flex-row-reverse" // Only reverse if sender is admin
               )}
             >
               <Avatar>
                 <AvatarImage src={sender?.avatar} />
-                <AvatarFallback>{sender?.name[0].toUpperCase()}</AvatarFallback>
+                <AvatarFallback>
+                  {message.senderId == ADMIN_ID ? 'A' : (sender?.name[0] || 'C')}
+                </AvatarFallback>
               </Avatar>
               <div
                 className={cn(
                   "flex flex-col",
-                  isCurrentUser && "items-end"
+                  message.senderId == ADMIN_ID && "items-end"
                 )}
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">{sender?.name}</span>
+                  <span className="text-sm font-medium">
+                    {message.senderId == ADMIN_ID ? 'Admin' : sender?.name}
+                  </span>
                   <span className="text-xs text-muted-foreground">
                     {new Date(message.createdAt).toLocaleTimeString()}
                   </span>
@@ -69,7 +75,7 @@ export function MessageList({ messages, users, currentUserId }: MessageListProps
                 <div
                   className={cn(
                     "rounded-lg p-3 max-w-[80%]",
-                    isCurrentUser
+                    message.senderId == ADMIN_ID
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted"
                   )}

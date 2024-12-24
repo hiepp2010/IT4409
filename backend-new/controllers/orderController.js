@@ -204,13 +204,32 @@ const getOrderById = async(req,res) => {
         {model: OrderItem, as: 'orderItems'}
       ]
     })
-    if (!order) return res.status(404).json({ error: 'Order not found' });
+    if (!order) return res.status(404).json({ error: 'Order not found 11111' });
+    console.log(order);
     res.status(200).json(order);
   } catch (error) {
+    console.log(error.message)
+    res.status(500).json({error:error.message})
+  }
+}
+
+const updateOrderStatus = async(req,res) => {
+  const {id} = req.params;
+  const {status} = req.body;
+  try{
+    const order = await OrderHistory.findByPk(id,{
+    })
+    if (!order) return res.status(404).json({ error: 'Order not found 11111' });
+    order.status = status; 
+    await order.save();
+
+    res.status(200).json(order);
+  } catch (error) {
+    console.log(error.message)
     res.status(500).json({error:error.message})
   }
 }
 
 
 
-module.exports = { createOrder, getOrdersByUserId, getAllOrders, getOrderById };
+module.exports = { createOrder, getOrdersByUserId, getAllOrders, getOrderById, updateOrderStatus};

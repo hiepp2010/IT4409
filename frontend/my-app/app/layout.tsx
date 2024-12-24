@@ -5,6 +5,7 @@ import { CartProvider } from "./contexts/CartContext";
 import { Toaster } from "@/components/ui/toaster"
 import NavBar from "../components/clients/navbar";
 import Footer from "../components/clients/footer";
+import FloatingContactButtons from "@/components/clients/FloatingContactButton";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -42,6 +43,7 @@ export default function RootLayout({
           </main>
           <Toaster />
           <Footer />
+          <FloatingContactButtons />
         </CartProvider>
       </body>
     </html>

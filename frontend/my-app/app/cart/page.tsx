@@ -97,7 +97,7 @@ export default function CartPage() {
                               Màu: {color?.name} | Kích thước: {item.selectedSize}
                             </p>
                           </div>
-                          <p className="font-semibold text-lg">${item.product.price.toFixed(2)}</p>
+                          <p className="font-semibold text-lg">₫{item.product.price.toFixed(2)}</p>
                         </div>
                         
                         <div className="mt-4 flex justify-between items-center">
@@ -149,7 +149,7 @@ export default function CartPage() {
                           </div>
                           <div className="flex items-center gap-4">
                             <p className="font-semibold text-lg">
-                              ${(item.product.price * item.quantity).toFixed(2)}
+                            ₫{(item.product.price * item.quantity).toFixed(2)}
                             </p>
                             <Button 
                               variant="ghost" 
@@ -181,16 +181,16 @@ export default function CartPage() {
             <div className="space-y-4">
               <div className="flex justify-between">
                 <span>Tạm tính:</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>₫{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Phí vận chuyển:</span>
-                <span>{shipping === 0 ? 'Miễn phí' : `$${shipping}`}</span>
+                <span>{shipping === 0 ? 'Miễn phí' : `₫${shipping}`}</span>
               </div>
               <Separator />
               <div className="flex justify-between font-semibold text-lg">
                 <span>Tổng cộng:</span>
-                <span>${total.toFixed(2)}</span>
+                <span>₫{total.toFixed(2)}</span>
               </div>
               <Button 
                 className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white text-lg py-6"

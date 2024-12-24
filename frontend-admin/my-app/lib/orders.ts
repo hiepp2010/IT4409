@@ -17,7 +17,7 @@ export interface Order {
   totalAmount: number;
   address: string;
   paymentMethod: string;
-  status: 'pending' | 'delivered' | 'cancelled';
+  status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
   createdAt: string;
   updatedAt: string;
   orderItems: OrderItem[];

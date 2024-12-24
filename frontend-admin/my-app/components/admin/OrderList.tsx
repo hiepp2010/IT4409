@@ -97,9 +97,11 @@ export default function OrderList({ orders }: OrderListProps) {
               <TableCell>
                 <Badge 
                   variant={
-                    order.status === 'delivered' ? 'success' : 
-                    order.status === 'cancelled' ? 'destructive' : 
-                    'default'
+                    order.status === 'Delivered' ? 'success' : 
+                    order.status === 'Processing' ? 'default' :
+                    // order.status === 'Shipped' ? 'warning' :
+                    order.status === 'Cancelled' ? 'destructive' : 
+                    'secondary'
                   }
                 >
                   {order.status}

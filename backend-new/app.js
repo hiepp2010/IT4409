@@ -29,8 +29,8 @@ app.use("/products", productRoutes);
 app.use("/categories", categoryRoutes);
 app.use("/subcategories", subcategoryRoutes);
 app.use("/auth", authRoutes);
-app.use("/", orderRoutes);
 app.use("/messages",messageRoutes)
+app.use("/", orderRoutes);
 
 const customers = {}; // Track connected customers by their socket ID
 let adminId;
@@ -41,6 +41,7 @@ socketIo.on("connection", (socket) => {
       socket.join("admins"); // Admins join a specific room
       adminId = userId;
     } else {
+      console.log(userId)
       customers[socket.id] = { userId }; // Track customers
       socket.join("customers"); // Customers join a specific room
     }
@@ -49,7 +50,7 @@ socketIo.on("connection", (socket) => {
   // Admin sending message to a specific customer
   socket.on("sendMessageToCustomer", async ({ customerId, message }) => {
     const customerSocketId = Object.keys(customers).find(
-      (key) => customers[key].userId === customerId
+      (key) => customers[key].userId == customerId
     );
     if (customerSocketId) {
       socketIo

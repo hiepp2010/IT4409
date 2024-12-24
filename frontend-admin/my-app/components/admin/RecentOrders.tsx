@@ -84,8 +84,8 @@ export function RecentOrders() {
             <TableCell>
               <Badge 
                 variant={
-                  order.status === 'delivered' ? 'success' : 
-                  order.status === 'cancelled' ? 'destructive' : 
+                  order.status === 'Delivered' ? 'success' : 
+                  order.status === 'Cancelled' ? 'destructive' : 
                   'default'
                 }
               >

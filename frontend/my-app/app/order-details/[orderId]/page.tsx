@@ -260,13 +260,13 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ o
                 <div className="flex justify-between">
                   <span>Shipping:</span>
                   <span>
-                    {order.shipping === 0 ? 'Free' : `$${order.shipping.toFixed(2)}`}
+                    {order.shipping === 0 ? 'Free' : `₫${order.shipping.toFixed(2)}`}
                   </span>
                 </div>
                 <Separator className="my-2" />
                 <div className="flex justify-between font-bold">
                   <span>Total:</span>
-                  <span>${order.total.toFixed(2)}</span>
+                  <span>₫{order.total.toFixed(2)}</span>
                 </div>
                 <div className="mt-4 pt-4 border-t">
                   <p className="text-sm text-gray-600">

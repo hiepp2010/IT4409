@@ -158,10 +158,10 @@ function ProductCard({ product, addItem }: ProductCardProps) {
         <div className="p-4">
           <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
           <p className="text-gray-600 mb-2">{product.brand}</p>
-          <p className="text-gray-600 mb-4 text-lg">${product.price.toFixed(2)}</p>
+          <p className="text-gray-600 mb-4 text-lg">₫{product.price.toFixed(2)}</p>
           {product.discountedPrice < product.price && (
             <p className="text-red-600 mb-2">
-              Sale: ${product.discountedPrice.toFixed(2)}
+              Sale: ₫{product.discountedPrice.toFixed(2)}
             </p>
           )}
           <div className="space-y-4 mb-4">

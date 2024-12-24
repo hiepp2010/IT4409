@@ -152,7 +152,7 @@ export function OrderDetails({ order }: OrderDetailsProps) {
                 <TableCell>{product.name}</TableCell>
                 <TableCell>#{product.orderId}</TableCell>
                 <TableCell>{product.quantity}</TableCell>
-                <TableCell className="text-right">₹{product.total.toFixed(2)}</TableCell>
+                <TableCell className="text-right">₫{product.total.toFixed(2)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -161,23 +161,23 @@ export function OrderDetails({ order }: OrderDetailsProps) {
         <div className="mt-6 space-y-2">
           <div className="flex justify-between text-sm">
             <span>Subtotal</span>
-            <span>₹{order.subtotal}</span>
+            <span>₫{order.subtotal}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Tax (20%)</span>
-            <span>₹{order.tax}</span>
+            <span>₫{order.tax}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Discount</span>
-            <span>₹{order.discount}</span>
+            <span>₫{order.discount}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Shipping Rate</span>
-            <span>₹{order.shippingRate}</span>
+            <span>₫{order.shippingRate}</span>
           </div>
           <div className="flex justify-between font-semibold text-lg pt-4 border-t">
             <span>Total</span>
-            <span>₹{order.total}</span>
+            <span>₫{order.total}</span>
           </div>
         </div>
       </Card>
