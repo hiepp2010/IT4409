@@ -21,10 +21,10 @@ const paymentWithVnpay = async ({ total_amount, ipAddr }) => {
     const returnUrl = "https://it-4409-client.vercel.app/checkout";
 
     // Generate timestamps
-    const date = moment();
+    const date = moment().utcOffset(7);
     const createDate = date.format("YYYYMMDDHHmmss");
     const orderId = date.format("HHmmss");
-    const expireDate = moment().add(6, "hours").format("YYYYMMDDHHmmss");
+    const expireDate = moment().add(24, "hours").format("YYYYMMDDHHmmss");
     const amount = total_amount; // Assuming total_amount is in VND
     const orderInfo = "Thanhtoanchokhachhang";
     const orderType = "200000"; // mặt hàng thời trang
@@ -204,32 +204,13 @@ const getOrderById = async(req,res) => {
         {model: OrderItem, as: 'orderItems'}
       ]
     })
-    if (!order) return res.status(404).json({ error: 'Order not found 11111' });
-    console.log(order);
+    if (!order) return res.status(404).json({ error: 'Order not found' });
     res.status(200).json(order);
   } catch (error) {
-    console.log(error.message)
-    res.status(500).json({error:error.message})
-  }
-}
-
-const updateOrderStatus = async(req,res) => {
-  const {id} = req.params;
-  const {status} = req.body;
-  try{
-    const order = await OrderHistory.findByPk(id,{
-    })
-    if (!order) return res.status(404).json({ error: 'Order not found 11111' });
-    order.status = status; 
-    await order.save();
-
-    res.status(200).json(order);
-  } catch (error) {
-    console.log(error.message)
     res.status(500).json({error:error.message})
   }
 }
 
 
 
-module.exports = { createOrder, getOrdersByUserId, getAllOrders, getOrderById, updateOrderStatus};
+module.exports = { createOrder, getOrdersByUserId, getAllOrders, getOrderById };

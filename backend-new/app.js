@@ -1,11 +1,11 @@
 const express = require("express");
 const http = require("http");
+const https = require("https")
 const productRoutes = require("./routes/productRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const subcategoryRoutes = require("./routes/subcategoryRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const authRoutes = require("./routes/authRoutes");
-const messageRoutes = require("./routes/messageRoute")
 const helmet = require("helmet");
 const xss = require("xss-clean");
 const cors = require("cors");
@@ -29,7 +29,6 @@ app.use("/products", productRoutes);
 app.use("/categories", categoryRoutes);
 app.use("/subcategories", subcategoryRoutes);
 app.use("/auth", authRoutes);
-app.use("/messages",messageRoutes)
 app.use("/", orderRoutes);
 
 const customers = {}; // Track connected customers by their socket ID
@@ -41,7 +40,6 @@ socketIo.on("connection", (socket) => {
       socket.join("admins"); // Admins join a specific room
       adminId = userId;
     } else {
-      console.log(userId)
       customers[socket.id] = { userId }; // Track customers
       socket.join("customers"); // Customers join a specific room
     }
@@ -50,7 +48,7 @@ socketIo.on("connection", (socket) => {
   // Admin sending message to a specific customer
   socket.on("sendMessageToCustomer", async ({ customerId, message }) => {
     const customerSocketId = Object.keys(customers).find(
-      (key) => customers[key].userId == customerId
+      (key) => customers[key].userId === customerId
     );
     if (customerSocketId) {
       socketIo
@@ -92,7 +90,7 @@ socketIo.on("connection", (socket) => {
 
 // Start the server
 const PORT = 3100;
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`Server is running on port ${PORT}`);
 });
