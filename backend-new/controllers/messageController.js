@@ -103,4 +103,4 @@ const abc = async (req, res) => {
   }
 };
 
-module.exports = { fetchMessageHistory };
+module.exports = { fetchMessageHistory, fetchCustomer };
