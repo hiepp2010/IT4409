@@ -21,10 +21,10 @@ const paymentWithVnpay = async ({ total_amount, ipAddr }) => {
     const returnUrl = "https://it-4409-client.vercel.app/checkout";
 
     // Generate timestamps
-    const date = moment();
+    const date = moment().utcOffset(7);
     const createDate = date.format("YYYYMMDDHHmmss");
     const orderId = date.format("HHmmss");
-    const expireDate = moment().add(6, "hours").format("YYYYMMDDHHmmss");
+    const expireDate = moment().add(24, "hours").format("YYYYMMDDHHmmss");
     const amount = total_amount; // Assuming total_amount is in VND
     const orderInfo = "Thanhtoanchokhachhang";
     const orderType = "200000"; // mặt hàng thời trang
