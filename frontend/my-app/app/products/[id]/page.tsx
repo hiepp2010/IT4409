@@ -1,33 +1,26 @@
 import { notFound } from 'next/navigation'
 import { getProductById } from '@/lib/product'
-import ProductDetail from './product-detail'
-import { Breadcrumb } from "@/components/ui/breadcrumb"
-import FloatingContactButtons from '@/components/FloatingContactButtons'
+import ProductDetail from './productdetail'
+import FloatingContactButtons from '@/components/clients/FloatingContactButton'
 
 interface ProductPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const product = await getProductById(params.id)
+  const {id} = await params;
+  const product = await getProductById(id)
 
   if (!product) {
     notFound()
   }
 
-  const breadcrumbItems = [
-    { title: "Trang chủ", href: "/" },
-    { title: "FOOTWEAR", href: "/category/footwear" },
-    { title: "SNEAKERS", href: "/subcategory/sneakers" },
-    { title: product.name, href: `/products/${product.id}` },
-  ]
 
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-4">
-        <Breadcrumb items={breadcrumbItems} />
         <ProductDetail product={product} />
       </div>
       <FloatingContactButtons />
