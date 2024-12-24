@@ -367,7 +367,7 @@ OrderItem.belongsTo(Color, { foreignKey: "colorId", as: "color" });
     // eslint-disable-next-line no-console
     console.log("Database synchronized with models");
   } catch (error) {
-    console.error("Unable to connect to the database:", error);
+    console.error("Unable 123 to connect to the database:", error);
   }
 })();
 

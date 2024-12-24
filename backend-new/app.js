@@ -91,5 +91,6 @@ socketIo.on("connection", (socket) => {
 const PORT = 3100;
 server.listen(PORT, () => {
   // eslint-disable-next-line no-console
+  console.log("server running")
   console.log(`Server is running on port ${PORT}`);
 });
