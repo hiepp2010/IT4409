@@ -246,8 +246,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       </div>
 
       <RelatedProducts 
-        // currentProductId={product.id} 
-        // categoryId={product.categoryId}
+        currentProductId={product.id} 
+        categoryId={product.categoryId}
       />
     </>
   )

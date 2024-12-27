@@ -15,31 +15,87 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 
-const RELATED_PRODUCT_IDS = [5, 6, 7, 8]
+interface RelatedProductsProps {
+  productId: number
+}
 
-export default function RelatedProducts() {
+interface RecommendationItem {
+  article_id: number;
+  color: string;
+  prod_name: string;
+  product_type: string;
+}
+
+interface RecommendationResponse {
+  article_id: number;
+  method: string;
+  recommendations: RecommendationItem[];
+}
+//const RELATED_PRODUCT_IDS = [5, 6, 7, 8]
+
+export default function RelatedProducts({ productId }: RelatedProductsProps) {
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // Fetch all products by IDs in parallel
-        const productPromises = RELATED_PRODUCT_IDS.map(id =>
-          fetch(`https://maixuanhieu20215576-web.onrender.com/products/${id}`).then(res => res.json())
-        )
+        // 1. Từ ID tìm SKU
+        const productResponse = await fetch(`https://maixuanhieu20215576-web.onrender.com/products/${productId}`)
+        if (!productResponse.ok) throw new Error('Failed to fetch product')
+        const productData = await productResponse.json()
+        console.log("Product Data:", productData)
         
+        const sku = productData.sku
+        if (!sku) {
+          console.error("Không tìm thấy SKU trong product data")
+          return
+        }
+        console.log("1. SKU của sản phẩm hiện tại:", sku)
+
+        // 2. Dùng SKU để gọi API gợi ý
+        const recommendResponse = await fetch(`https://3a19-35-231-2-27.ngrok-free.app/recommend/content/0${sku}`)
+        if (!recommendResponse.ok) {
+          console.error("Recommend API Error:", await recommendResponse.text())
+          throw new Error('Failed to fetch recommendations')
+        }
+        
+        const recommendData: RecommendationResponse = await recommendResponse.json()
+        console.log("2. Dữ liệu từ API gợi ý:", recommendData)
+        
+        // 3. Với mỗi article_id, tìm sản phẩm tương ứng
+        const productPromises = recommendData.recommendations.map(async item => {
+          try {
+            const skuResponse = await fetch(`https://maixuanhieu20215576-web.onrender.com/products/sku/${item.article_id}`)
+            if (!skuResponse.ok) return null
+            
+            const productFromSku = await skuResponse.json()
+            console.log("3. Sản phẩm tìm được từ article_id:", item.article_id, productFromSku)
+            
+            if (!productFromSku || !productFromSku.id) return null
+            return productFromSku
+          } catch (error) {
+            console.error("Error fetching product from SKU:", error)
+            return null
+          }
+        })
+
         const fetchedProducts = await Promise.all(productPromises)
-        setProducts(fetchedProducts.filter(Boolean)) // Filter out any null responses
+        console.log("4. Danh sách sản phẩm cuối cùng:", fetchedProducts.filter(Boolean))
+        setProducts(fetchedProducts.filter(Boolean))
       } catch (error) {
+        console.error('Error details:', error)
         console.error('Error fetching related products:', error)
       } finally {
         setIsLoading(false)
       }
     }
 
-    fetchProducts()
-  }, [])
+    if (productId) {
+      console.log("ProductID nhận được:", productId)
+      fetchProducts()
+    }
+  }, [productId])
 
   if (isLoading) {
     return <div className="h-[400px] flex items-center justify-center">Loading...</div>

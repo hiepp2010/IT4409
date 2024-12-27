@@ -45,6 +45,34 @@ const productController = {
     }
   },
 
+  getProductBySku: async (req, res) => {
+    const { sku } = req.params;
+
+    try {
+        const product = await Product.findOne({
+            where: { sku },
+            include: [
+                { 
+                    model: Color, 
+                    as: 'colors', 
+                    include: [
+                        { model: Size, as: 'sizes' }, 
+                        { model: ImagePath, as: 'imagePaths' }
+                    ] 
+                },
+                { model: SubCategory, as: 'subCategory' }
+            ]
+        });
+
+        if (!product) return res.status(404).json({ error: 'Product not found' });
+
+        res.status(200).json(product);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+  },
+
+
   createProduct: async (req, res) => {
     const { name, description, subcategoryId, brand, sku, price, discountedPrice, tags, colors } = req.body;
     try {
