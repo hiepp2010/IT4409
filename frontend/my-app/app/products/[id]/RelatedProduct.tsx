@@ -15,11 +15,9 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 
-interface RelatedProductsProps {
-  productId: number
-}
+//const RELATED_PRODUCT_IDS = [5, 6, 7, 8]
 
-interface RecommendationItem {
+interface RecommendedProduct {
   article_id: number;
   color: string;
   prod_name: string;
@@ -29,73 +27,79 @@ interface RecommendationItem {
 interface RecommendationResponse {
   article_id: number;
   method: string;
-  recommendations: RecommendationItem[];
+  recommendations: RecommendedProduct[];
 }
-//const RELATED_PRODUCT_IDS = [5, 6, 7, 8]
 
-export default function RelatedProducts({ productId }: RelatedProductsProps) {
+interface RelatedProductsProps {
+  currentSku: string;
+}
+
+export default function RelatedProducts({ currentSku }: RelatedProductsProps) {
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // 1. Từ ID tìm SKU
-        const productResponse = await fetch(`https://maixuanhieu20215576-web.onrender.com/products/${productId}`)
-        if (!productResponse.ok) throw new Error('Failed to fetch product')
-        const productData = await productResponse.json()
-        console.log("Product Data:", productData)
-        
-        const sku = productData.sku
-        if (!sku) {
-          console.error("Không tìm thấy SKU trong product data")
-          return
-        }
-        console.log("1. SKU của sản phẩm hiện tại:", sku)
+        // 1. Fetch recommendations
+        const url = `https://d940-104-196-207-107.ngrok-free.app/recommend/content/0${currentSku}`;
 
-        // 2. Dùng SKU để gọi API gợi ý
-        const recommendResponse = await fetch(`https://3a19-35-231-2-27.ngrok-free.app/recommend/content/0${sku}`)
+        const recommendResponse = await fetch(url, {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true'
+          },
+        });
+
         if (!recommendResponse.ok) {
-          console.error("Recommend API Error:", await recommendResponse.text())
-          throw new Error('Failed to fetch recommendations')
+          throw new Error(`Error fetching recommendations: ${recommendResponse.status}`);
         }
+
+        const recommendData: RecommendationResponse = await recommendResponse.json();
         
-        const recommendData: RecommendationResponse = await recommendResponse.json()
-        console.log("2. Dữ liệu từ API gợi ý:", recommendData)
-        
-        // 3. Với mỗi article_id, tìm sản phẩm tương ứng
-        const productPromises = recommendData.recommendations.map(async item => {
+        // 2. Fetch products - bỏ qua sản phẩm không tồn tại
+        const productPromises = recommendData.recommendations.map(async (item) => {
           try {
-            const skuResponse = await fetch(`https://maixuanhieu20215576-web.onrender.com/products/sku/${item.article_id}`)
-            if (!skuResponse.ok) return null
+            const productResponse = await fetch(
+              `https://maixuanhieu20215576-web.onrender.com/products/sku/${item.article_id}`,
+              {
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                },
+              }
+            );
             
-            const productFromSku = await skuResponse.json()
-            console.log("3. Sản phẩm tìm được từ article_id:", item.article_id, productFromSku)
-            
-            if (!productFromSku || !productFromSku.id) return null
-            return productFromSku
-          } catch (error) {
-            console.error("Error fetching product from SKU:", error)
-            return null
+            if (!productResponse.ok) {
+              return null; // Chỉ return null, không log lỗi
+            }
+
+            return await productResponse.json();
+          } catch (err) {
+            return null; // Chỉ return null, không log lỗi
           }
-        })
+        });
+        
+        const fetchedProducts = await Promise.all(productPromises);
+        
+        // Lọc bỏ các sản phẩm null và undefined
+        const validProducts = fetchedProducts.filter((product): product is Product => 
+          product !== null && product !== undefined
+        );
 
-        const fetchedProducts = await Promise.all(productPromises)
-        console.log("4. Danh sách sản phẩm cuối cùng:", fetchedProducts.filter(Boolean))
-        setProducts(fetchedProducts.filter(Boolean))
+        setProducts(validProducts);
       } catch (error) {
-        console.error('Error details:', error)
-        console.error('Error fetching related products:', error)
+        console.error('Error in fetchProducts:', error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    if (productId) {
-      console.log("ProductID nhận được:", productId)
-      fetchProducts()
+    if (currentSku) {
+      fetchProducts();
     }
-  }, [productId])
+  }, [currentSku]);
 
   if (isLoading) {
     return <div className="h-[400px] flex items-center justify-center">Loading...</div>
